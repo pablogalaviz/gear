@@ -81,7 +81,7 @@ int main(const int ac, char *av[]) {
                 cmri::LOGGER.init(cmri::log_t::INFO, log_file);
         }
 
-        cmri::welcome("GEAR");
+        cmri::welcome("GEAR, Genomic sEquence AnalyzeR.");
 
         if (vm.count("help") || vm.count("input") == 0 || vm.count("motifs") == 0) {
             if (vm.count("input") == 0 && vm.count("help") == 0)
