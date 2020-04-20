@@ -1,0 +1,1192 @@
+{
+  "chr1": [
+    {
+      "start": 10001,
+      "end": 12464,
+      "name": "p_telomere",
+      "motifs": {
+        "TTAGGG": 0,
+        "TCAGGG": 0,
+        "TGAGGG": 0,
+        "TTGGGG": 0
+      },
+      "regex": {
+        "(TTAGGG)(.{1})(TTAGGG)": 0,
+        "(TTAGGG)(.{2})(TTAGGG)": 0
+      }
+    },
+    {
+      "start": 249237907,
+      "end": 249240620,
+      "name": "q_telomere",
+      "motifs": {
+        "TTAGGG": 0,
+        "TCAGGG": 0,
+        "TGAGGG": 0,
+        "TTGGGG": 0
+      },
+      "regex": {
+        "(TTAGGG)(.{1})(TTAGGG)": 0,
+        "(TTAGGG)(.{2})(TTAGGG)": 0
+      }
+    },
+    {
+      "start": 12465,
+      "end": 249237906,
+      "name": "inner_non_telomeric",
+      "motifs": {
+        "TTAGGG": 0,
+        "TCAGGG": 0,
+        "TGAGGG": 0,
+        "TTGGGG": 0
+      },
+      "regex": {
+        "(TTAGGG)(.{1})(TTAGGG)": 0,
+        "(TTAGGG)(.{2})(TTAGGG)": 0
+      }
+    }
+  ],
+  "chr2": [
+    {
+      "start": 10001,
+      "end": 12592,
+      "name": "p_telomere",
+      "motifs": {
+        "TTAGGG": 0,
+        "TCAGGG": 0,
+        "TGAGGG": 0,
+        "TTGGGG": 0
+      },
+      "regex": {
+        "(TTAGGG)(.{1})(TTAGGG)": 0,
+        "(TTAGGG)(.{2})(TTAGGG)": 0
+      }
+    },
+    {
+      "start": 243187373,
+      "end": 243189372,
+      "name": "q_telomere",
+      "motifs": {
+        "TTAGGG": 0,
+        "TCAGGG": 0,
+        "TGAGGG": 0,
+        "TTGGGG": 0
+      },
+      "regex": {
+        "(TTAGGG)(.{1})(TTAGGG)": 0,
+        "(TTAGGG)(.{2})(TTAGGG)": 0
+      }
+    },
+    {
+      "start": 243150480,
+      "end": 243154648,
+      "name": "A_telomere",
+      "motifs": {
+        "TTAGGG": 0,
+        "TCAGGG": 0,
+        "TGAGGG": 0,
+        "TTGGGG": 0
+      },
+      "regex": {
+        "(TTAGGG)(.{1})(TTAGGG)": 0,
+        "(TTAGGG)(.{2})(TTAGGG)": 0
+      }
+    },
+    {
+      "start": 12593,
+      "end": 243187372,
+      "name": "inner_non_telomeric",
+      "motifs": {
+        "TTAGGG": 0,
+        "TCAGGG": 0,
+        "TGAGGG": 0,
+        "TTGGGG": 0
+      },
+      "regex": {
+        "(TTAGGG)(.{1})(TTAGGG)": 0,
+        "(TTAGGG)(.{2})(TTAGGG)": 0
+      }
+    }
+  ],
+  "chr3": [
+    {
+      "start": 60001,
+      "end": 62000,
+      "name": "p_telomere",
+      "motifs": {
+        "TTAGGG": 0,
+        "TCAGGG": 0,
+        "TGAGGG": 0,
+        "TTGGGG": 0
+      },
+      "regex": {
+        "(TTAGGG)(.{1})(TTAGGG)": 0,
+        "(TTAGGG)(.{2})(TTAGGG)": 0
+      }
+    },
+    {
+      "start": 197960430,
+      "end": 243189372,
+      "name": "q_telomere",
+      "motifs": {
+        "TTAGGG": 0,
+        "TCAGGG": 0,
+        "TGAGGG": 0,
+        "TTGGGG": 0
+      },
+      "regex": {
+        "(TTAGGG)(.{1})(TTAGGG)": 0,
+        "(TTAGGG)(.{2})(TTAGGG)": 0
+      }
+    },
+    {
+      "start": 197897576,
+      "end": 197903397,
+      "name": "B_telomere",
+      "motifs": {
+        "TTAGGG": 0,
+        "TCAGGG": 0,
+        "TGAGGG": 0,
+        "TTGGGG": 0
+      },
+      "regex": {
+        "(TTAGGG)(.{1})(TTAGGG)": 0,
+        "(TTAGGG)(.{2})(TTAGGG)": 0
+      }
+    },
+    {
+      "start": 62001,
+      "end": 197960429,
+      "name": "inner_non_telomeric",
+      "motifs": {
+        "TTAGGG": 0,
+        "TCAGGG": 0,
+        "TGAGGG": 0,
+        "TTGGGG": 0
+      },
+      "regex": {
+        "(TTAGGG)(.{1})(TTAGGG)": 0,
+        "(TTAGGG)(.{2})(TTAGGG)": 0
+      }
+    }
+  ],
+  "chr4": [
+    {
+      "start": 10001,
+      "end": 12193,
+      "name": "p_telomere",
+      "motifs": {
+        "TTAGGG": 0,
+        "TCAGGG": 0,
+        "TGAGGG": 0,
+        "TTGGGG": 0
+      },
+      "regex": {
+        "(TTAGGG)(.{1})(TTAGGG)": 0,
+        "(TTAGGG)(.{2})(TTAGGG)": 0
+      }
+    },
+    {
+      "start": 191041613,
+      "end": 191044275,
+      "name": "q_telomere",
+      "motifs": {
+        "TTAGGG": 0,
+        "TCAGGG": 0,
+        "TGAGGG": 0,
+        "TTGGGG": 0
+      },
+      "regex": {
+        "(TTAGGG)(.{1})(TTAGGG)": 0,
+        "(TTAGGG)(.{2})(TTAGGG)": 0
+      }
+    },
+    {
+      "start": 12194,
+      "end": 191041612,
+      "name": "inner_non_telomeric",
+      "motifs": {
+        "TTAGGG": 0,
+        "TCAGGG": 0,
+        "TGAGGG": 0,
+        "TTGGGG": 0
+      },
+      "regex": {
+        "(TTAGGG)(.{1})(TTAGGG)": 0,
+        "(TTAGGG)(.{2})(TTAGGG)": 0
+      }
+    }
+  ],
+  "chr5": [
+    {
+      "start": 10001,
+      "end": 13806,
+      "name": "p_telomere",
+      "motifs": {
+        "TTAGGG": 0,
+        "TCAGGG": 0,
+        "TGAGGG": 0,
+        "TTGGGG": 0
+      },
+      "regex": {
+        "(TTAGGG)(.{1})(TTAGGG)": 0,
+        "(TTAGGG)(.{2})(TTAGGG)": 0
+      }
+    },
+    {
+      "start": 180903260,
+      "end": 180905259,
+      "name": "q_telomere",
+      "motifs": {
+        "TTAGGG": 0,
+        "TCAGGG": 0,
+        "TGAGGG": 0,
+        "TTGGGG": 0
+      },
+      "regex": {
+        "(TTAGGG)(.{1})(TTAGGG)": 0,
+        "(TTAGGG)(.{2})(TTAGGG)": 0
+      }
+    },
+    {
+      "start": 13807,
+      "end": 180903259,
+      "name": "inner_non_telomeric",
+      "motifs": {
+        "TTAGGG": 0,
+        "TCAGGG": 0,
+        "TGAGGG": 0,
+        "TTGGGG": 0
+      },
+      "regex": {
+        "(TTAGGG)(.{1})(TTAGGG)": 0,
+        "(TTAGGG)(.{2})(TTAGGG)": 0
+      }
+    }
+  ],
+  "chr6": [
+    {
+      "start": 60001,
+      "end": 62000,
+      "name": "p_telomere",
+      "motifs": {
+        "TTAGGG": 0,
+        "TCAGGG": 0,
+        "TGAGGG": 0,
+        "TTGGGG": 0
+      },
+      "regex": {
+        "(TTAGGG)(.{1})(TTAGGG)": 0,
+        "(TTAGGG)(.{2})(TTAGGG)": 0
+      }
+    },
+    {
+      "start": 171053067,
+      "end": 171055066,
+      "name": "q_telomere",
+      "motifs": {
+        "TTAGGG": 0,
+        "TCAGGG": 0,
+        "TGAGGG": 0,
+        "TTGGGG": 0
+      },
+      "regex": {
+        "(TTAGGG)(.{1})(TTAGGG)": 0,
+        "(TTAGGG)(.{2})(TTAGGG)": 0
+      }
+    },
+    {
+      "start": 62001,
+      "end": 171053066,
+      "name": "inner_non_telomeric",
+      "motifs": {
+        "TTAGGG": 0,
+        "TCAGGG": 0,
+        "TGAGGG": 0,
+        "TTGGGG": 0
+      },
+      "regex": {
+        "(TTAGGG)(.{1})(TTAGGG)": 0,
+        "(TTAGGG)(.{2})(TTAGGG)": 0
+      }
+    }
+  ],
+  "chr7": [
+    {
+      "start": 10001,
+      "end": 12238,
+      "name": "p_telomere",
+      "motifs": {
+        "TTAGGG": 0,
+        "TCAGGG": 0,
+        "TGAGGG": 0,
+        "TTGGGG": 0
+      },
+      "regex": {
+        "(TTAGGG)(.{1})(TTAGGG)": 0,
+        "(TTAGGG)(.{2})(TTAGGG)": 0
+      }
+    },
+    {
+      "start": 159126558,
+      "end": 159128662,
+      "name": "q_telomere",
+      "motifs": {
+        "TTAGGG": 0,
+        "TCAGGG": 0,
+        "TGAGGG": 0,
+        "TTGGGG": 0
+      },
+      "regex": {
+        "(TTAGGG)(.{1})(TTAGGG)": 0,
+        "(TTAGGG)(.{2})(TTAGGG)": 0
+      }
+    },
+    {
+      "start": 12239,
+      "end": 159126557,
+      "name": "inner_non_telomeric",
+      "motifs": {
+        "TTAGGG": 0,
+        "TCAGGG": 0,
+        "TGAGGG": 0,
+        "TTGGGG": 0
+      },
+      "regex": {
+        "(TTAGGG)(.{1})(TTAGGG)": 0,
+        "(TTAGGG)(.{2})(TTAGGG)": 0
+      }
+    }
+  ],
+  "chr8": [
+    {
+      "start": 10001,
+      "end": 12000,
+      "name": "p_telomere",
+      "motifs": {
+        "TTAGGG": 0,
+        "TCAGGG": 0,
+        "TGAGGG": 0,
+        "TTGGGG": 0
+      },
+      "regex": {
+        "(TTAGGG)(.{1})(TTAGGG)": 0,
+        "(TTAGGG)(.{2})(TTAGGG)": 0
+      }
+    },
+    {
+      "start": 146302022,
+      "end": 146304021,
+      "name": "q_telomere",
+      "motifs": {
+        "TTAGGG": 0,
+        "TCAGGG": 0,
+        "TGAGGG": 0,
+        "TTGGGG": 0
+      },
+      "regex": {
+        "(TTAGGG)(.{1})(TTAGGG)": 0,
+        "(TTAGGG)(.{2})(TTAGGG)": 0
+      }
+    },
+    {
+      "start": 12001,
+      "end": 146302021,
+      "name": "inner_non_telomeric",
+      "motifs": {
+        "TTAGGG": 0,
+        "TCAGGG": 0,
+        "TGAGGG": 0,
+        "TTGGGG": 0
+      },
+      "regex": {
+        "(TTAGGG)(.{1})(TTAGGG)": 0,
+        "(TTAGGG)(.{2})(TTAGGG)": 0
+      }
+    }
+  ],
+  "chr9": [
+    {
+      "start": 10001,
+      "end": 12359,
+      "name": "p_telomere",
+      "motifs": {
+        "TTAGGG": 0,
+        "TCAGGG": 0,
+        "TGAGGG": 0,
+        "TTGGGG": 0
+      },
+      "regex": {
+        "(TTAGGG)(.{1})(TTAGGG)": 0,
+        "(TTAGGG)(.{2})(TTAGGG)": 0
+      }
+    },
+    {
+      "start": 141151431,
+      "end": 141153430,
+      "name": "q_telomere",
+      "motifs": {
+        "TTAGGG": 0,
+        "TCAGGG": 0,
+        "TGAGGG": 0,
+        "TTGGGG": 0
+      },
+      "regex": {
+        "(TTAGGG)(.{1})(TTAGGG)": 0,
+        "(TTAGGG)(.{2})(TTAGGG)": 0
+      }
+    },
+    {
+      "start": 12360,
+      "end": 141151430,
+      "name": "inner_non_telomeric",
+      "motifs": {
+        "TTAGGG": 0,
+        "TCAGGG": 0,
+        "TGAGGG": 0,
+        "TTGGGG": 0
+      },
+      "regex": {
+        "(TTAGGG)(.{1})(TTAGGG)": 0,
+        "(TTAGGG)(.{2})(TTAGGG)": 0
+      }
+    }
+  ],
+  "chr10": [
+    {
+      "start": 60001,
+      "end": 62000,
+      "name": "p_telomere",
+      "motifs": {
+        "TTAGGG": 0,
+        "TCAGGG": 0,
+        "TGAGGG": 0,
+        "TTGGGG": 0
+      },
+      "regex": {
+        "(TTAGGG)(.{1})(TTAGGG)": 0,
+        "(TTAGGG)(.{2})(TTAGGG)": 0
+      }
+    },
+    {
+      "start": 135522469,
+      "end": 135524746,
+      "name": "q_telomere",
+      "motifs": {
+        "TTAGGG": 0,
+        "TCAGGG": 0,
+        "TGAGGG": 0,
+        "TTGGGG": 0
+      },
+      "regex": {
+        "(TTAGGG)(.{1})(TTAGGG)": 0,
+        "(TTAGGG)(.{2})(TTAGGG)": 0
+      }
+    },
+    {
+      "start": 62001,
+      "end": 135522468,
+      "name": "inner_non_telomeric",
+      "motifs": {
+        "TTAGGG": 0,
+        "TCAGGG": 0,
+        "TGAGGG": 0,
+        "TTGGGG": 0
+      },
+      "regex": {
+        "(TTAGGG)(.{1})(TTAGGG)": 0,
+        "(TTAGGG)(.{2})(TTAGGG)": 0
+      }
+    }
+  ],
+  "chr11": [
+    {
+      "start": 60001,
+      "end": 62000,
+      "name": "p_telomere",
+      "motifs": {
+        "TTAGGG": 0,
+        "TCAGGG": 0,
+        "TGAGGG": 0,
+        "TTGGGG": 0
+      },
+      "regex": {
+        "(TTAGGG)(.{1})(TTAGGG)": 0,
+        "(TTAGGG)(.{2})(TTAGGG)": 0
+      }
+    },
+    {
+      "start": 134944458,
+      "end": 134946515,
+      "name": "q_telomere",
+      "motifs": {
+        "TTAGGG": 0,
+        "TCAGGG": 0,
+        "TGAGGG": 0,
+        "TTGGGG": 0
+      },
+      "regex": {
+        "(TTAGGG)(.{1})(TTAGGG)": 0,
+        "(TTAGGG)(.{2})(TTAGGG)": 0
+      }
+    },
+    {
+      "start": 62001,
+      "end": 134944457,
+      "name": "inner_non_telomeric",
+      "motifs": {
+        "TTAGGG": 0,
+        "TCAGGG": 0,
+        "TGAGGG": 0,
+        "TTGGGG": 0
+      },
+      "regex": {
+        "(TTAGGG)(.{1})(TTAGGG)": 0,
+        "(TTAGGG)(.{2})(TTAGGG)": 0
+      }
+    }
+  ],
+  "chr12": [
+    {
+      "start": 60001,
+      "end": 62000,
+      "name": "p_telomere",
+      "motifs": {
+        "TTAGGG": 0,
+        "TCAGGG": 0,
+        "TGAGGG": 0,
+        "TTGGGG": 0
+      },
+      "regex": {
+        "(TTAGGG)(.{1})(TTAGGG)": 0,
+        "(TTAGGG)(.{2})(TTAGGG)": 0
+      }
+    },
+    {
+      "start": 133839458,
+      "end": 133841894,
+      "name": "q_telomere",
+      "motifs": {
+        "TTAGGG": 0,
+        "TCAGGG": 0,
+        "TGAGGG": 0,
+        "TTGGGG": 0
+      },
+      "regex": {
+        "(TTAGGG)(.{1})(TTAGGG)": 0,
+        "(TTAGGG)(.{2})(TTAGGG)": 0
+      }
+    },
+    {
+      "start": 93158,
+      "end": 97735,
+      "name": "C_telomere",
+      "motifs": {
+        "TTAGGG": 0,
+        "TCAGGG": 0,
+        "TGAGGG": 0,
+        "TTGGGG": 0
+      },
+      "regex": {
+        "(TTAGGG)(.{1})(TTAGGG)": 0,
+        "(TTAGGG)(.{2})(TTAGGG)": 0
+      }
+    },
+    {
+      "start": 62001,
+      "end": 133839457,
+      "name": "inner_non_telomeric",
+      "motifs": {
+        "TTAGGG": 0,
+        "TCAGGG": 0,
+        "TGAGGG": 0,
+        "TTGGGG": 0
+      },
+      "regex": {
+        "(TTAGGG)(.{1})(TTAGGG)": 0,
+        "(TTAGGG)(.{2})(TTAGGG)": 0
+      }
+    }
+  ],
+  "chr13": [
+    {
+      "start": 19020001,
+      "end": 19022000,
+      "name": "p_telomere",
+      "motifs": {
+        "TTAGGG": 0,
+        "TCAGGG": 0,
+        "TGAGGG": 0,
+        "TTGGGG": 0
+      },
+      "regex": {
+        "(TTAGGG)(.{1})(TTAGGG)": 0,
+        "(TTAGGG)(.{2})(TTAGGG)": 0
+      }
+    },
+    {
+      "start": 115107878,
+      "end": 115109877,
+      "name": "q_telomere",
+      "motifs": {
+        "TTAGGG": 0,
+        "TCAGGG": 0,
+        "TGAGGG": 0,
+        "TTGGGG": 0
+      },
+      "regex": {
+        "(TTAGGG)(.{1})(TTAGGG)": 0,
+        "(TTAGGG)(.{2})(TTAGGG)": 0
+      }
+    },
+    {
+      "start": 19022001,
+      "end": 115107877,
+      "name": "inner_non_telomeric",
+      "motifs": {
+        "TTAGGG": 0,
+        "TCAGGG": 0,
+        "TGAGGG": 0,
+        "TTGGGG": 0
+      },
+      "regex": {
+        "(TTAGGG)(.{1})(TTAGGG)": 0,
+        "(TTAGGG)(.{2})(TTAGGG)": 0
+      }
+    }
+  ],
+  "chr14": [
+    {
+      "start": 19020001,
+      "end": 19022000,
+      "name": "p_telomere",
+      "motifs": {
+        "TTAGGG": 0,
+        "TCAGGG": 0,
+        "TGAGGG": 0,
+        "TTGGGG": 0
+      },
+      "regex": {
+        "(TTAGGG)(.{1})(TTAGGG)": 0,
+        "(TTAGGG)(.{2})(TTAGGG)": 0
+      }
+    },
+    {
+      "start": 107287540,
+      "end": 107289539,
+      "name": "q_telomere",
+      "motifs": {
+        "TTAGGG": 0,
+        "TCAGGG": 0,
+        "TGAGGG": 0,
+        "TTGGGG": 0
+      },
+      "regex": {
+        "(TTAGGG)(.{1})(TTAGGG)": 0,
+        "(TTAGGG)(.{2})(TTAGGG)": 0
+      }
+    },
+    {
+      "start": 19022001,
+      "end": 107287539,
+      "name": "inner_non_telomeric",
+      "motifs": {
+        "TTAGGG": 0,
+        "TCAGGG": 0,
+        "TGAGGG": 0,
+        "TTGGGG": 0
+      },
+      "regex": {
+        "(TTAGGG)(.{1})(TTAGGG)": 0,
+        "(TTAGGG)(.{2})(TTAGGG)": 0
+      }
+    }
+  ],
+  "chr15": [
+    {
+      "start": 20000001,
+      "end": 20002000,
+      "name": "p_telomere",
+      "motifs": {
+        "TTAGGG": 0,
+        "TCAGGG": 0,
+        "TGAGGG": 0,
+        "TTGGGG": 0
+      },
+      "regex": {
+        "(TTAGGG)(.{1})(TTAGGG)": 0,
+        "(TTAGGG)(.{2})(TTAGGG)": 0
+      }
+    },
+    {
+      "start": 102518969,
+      "end": 102521391,
+      "name": "q_telomere",
+      "motifs": {
+        "TTAGGG": 0,
+        "TCAGGG": 0,
+        "TGAGGG": 0,
+        "TTGGGG": 0
+      },
+      "regex": {
+        "(TTAGGG)(.{1})(TTAGGG)": 0,
+        "(TTAGGG)(.{2})(TTAGGG)": 0
+      }
+    },
+    {
+      "start": 20002001,
+      "end": 102518968,
+      "name": "inner_non_telomeric",
+      "motifs": {
+        "TTAGGG": 0,
+        "TCAGGG": 0,
+        "TGAGGG": 0,
+        "TTGGGG": 0
+      },
+      "regex": {
+        "(TTAGGG)(.{1})(TTAGGG)": 0,
+        "(TTAGGG)(.{2})(TTAGGG)": 0
+      }
+    }
+  ],
+  "chr16": [
+    {
+      "start": 60001,
+      "end": 62033,
+      "name": "p_telomere",
+      "motifs": {
+        "TTAGGG": 0,
+        "TCAGGG": 0,
+        "TGAGGG": 0,
+        "TTGGGG": 0
+      },
+      "regex": {
+        "(TTAGGG)(.{1})(TTAGGG)": 0,
+        "(TTAGGG)(.{2})(TTAGGG)": 0
+      }
+    },
+    {
+      "start": 90292753,
+      "end": 90294752,
+      "name": "q_telomere",
+      "motifs": {
+        "TTAGGG": 0,
+        "TCAGGG": 0,
+        "TGAGGG": 0,
+        "TTGGGG": 0
+      },
+      "regex": {
+        "(TTAGGG)(.{1})(TTAGGG)": 0,
+        "(TTAGGG)(.{2})(TTAGGG)": 0
+      }
+    },
+    {
+      "start": 62034,
+      "end": 90292752,
+      "name": "inner_non_telomeric",
+      "motifs": {
+        "TTAGGG": 0,
+        "TCAGGG": 0,
+        "TGAGGG": 0,
+        "TTGGGG": 0
+      },
+      "regex": {
+        "(TTAGGG)(.{1})(TTAGGG)": 0,
+        "(TTAGGG)(.{2})(TTAGGG)": 0
+      }
+    }
+  ],
+  "chr17": [
+    {
+      "start": 1,
+      "end": 2000,
+      "name": "p_telomere",
+      "motifs": {
+        "TTAGGG": 0,
+        "TCAGGG": 0,
+        "TGAGGG": 0,
+        "TTGGGG": 0
+      },
+      "regex": {
+        "(TTAGGG)(.{1})(TTAGGG)": 0,
+        "(TTAGGG)(.{2})(TTAGGG)": 0
+      }
+    },
+    {
+      "start": 81193211,
+      "end": 81195210,
+      "name": "q_telomere",
+      "motifs": {
+        "TTAGGG": 0,
+        "TCAGGG": 0,
+        "TGAGGG": 0,
+        "TTGGGG": 0
+      },
+      "regex": {
+        "(TTAGGG)(.{1})(TTAGGG)": 0,
+        "(TTAGGG)(.{2})(TTAGGG)": 0
+      }
+    },
+    {
+      "start": 2001,
+      "end": 81193210,
+      "name": "inner_non_telomeric",
+      "motifs": {
+        "TTAGGG": 0,
+        "TCAGGG": 0,
+        "TGAGGG": 0,
+        "TTGGGG": 0
+      },
+      "regex": {
+        "(TTAGGG)(.{1})(TTAGGG)": 0,
+        "(TTAGGG)(.{2})(TTAGGG)": 0
+      }
+    }
+  ],
+  "chr18": [
+    {
+      "start": 10001,
+      "end": 12621,
+      "name": "p_telomere",
+      "motifs": {
+        "TTAGGG": 0,
+        "TCAGGG": 0,
+        "TGAGGG": 0,
+        "TTGGGG": 0
+      },
+      "regex": {
+        "(TTAGGG)(.{1})(TTAGGG)": 0,
+        "(TTAGGG)(.{2})(TTAGGG)": 0
+      }
+    },
+    {
+      "start": 78014226,
+      "end": 78017247,
+      "name": "q_telomere",
+      "motifs": {
+        "TTAGGG": 0,
+        "TCAGGG": 0,
+        "TGAGGG": 0,
+        "TTGGGG": 0
+      },
+      "regex": {
+        "(TTAGGG)(.{1})(TTAGGG)": 0,
+        "(TTAGGG)(.{2})(TTAGGG)": 0
+      }
+    },
+    {
+      "start": 12622,
+      "end": 78014225,
+      "name": "inner_non_telomeric",
+      "motifs": {
+        "TTAGGG": 0,
+        "TCAGGG": 0,
+        "TGAGGG": 0,
+        "TTGGGG": 0
+      },
+      "regex": {
+        "(TTAGGG)(.{1})(TTAGGG)": 0,
+        "(TTAGGG)(.{2})(TTAGGG)": 0
+      }
+    }
+  ],
+  "chr19": [
+    {
+      "start": 60001,
+      "end": 62000,
+      "name": "p_telomere",
+      "motifs": {
+        "TTAGGG": 0,
+        "TCAGGG": 0,
+        "TGAGGG": 0,
+        "TTGGGG": 0
+      },
+      "regex": {
+        "(TTAGGG)(.{1})(TTAGGG)": 0,
+        "(TTAGGG)(.{2})(TTAGGG)": 0
+      }
+    },
+    {
+      "start": 59116822,
+      "end": 59118982,
+      "name": "q_telomere",
+      "motifs": {
+        "TTAGGG": 0,
+        "TCAGGG": 0,
+        "TGAGGG": 0,
+        "TTGGGG": 0
+      },
+      "regex": {
+        "(TTAGGG)(.{1})(TTAGGG)": 0,
+        "(TTAGGG)(.{2})(TTAGGG)": 0
+      }
+    },
+    {
+      "start": 62001,
+      "end": 59116821,
+      "name": "inner_non_telomeric",
+      "motifs": {
+        "TTAGGG": 0,
+        "TCAGGG": 0,
+        "TGAGGG": 0,
+        "TTGGGG": 0
+      },
+      "regex": {
+        "(TTAGGG)(.{1})(TTAGGG)": 0,
+        "(TTAGGG)(.{2})(TTAGGG)": 0
+      }
+    }
+  ],
+  "chr20": [
+    {
+      "start": 60001,
+      "end": 62000,
+      "name": "p_telomere",
+      "motifs": {
+        "TTAGGG": 0,
+        "TCAGGG": 0,
+        "TGAGGG": 0,
+        "TTGGGG": 0
+      },
+      "regex": {
+        "(TTAGGG)(.{1})(TTAGGG)": 0,
+        "(TTAGGG)(.{2})(TTAGGG)": 0
+      }
+    },
+    {
+      "start": 62963520,
+      "end": 62965519,
+      "name": "q_telomere",
+      "motifs": {
+        "TTAGGG": 0,
+        "TCAGGG": 0,
+        "TGAGGG": 0,
+        "TTGGGG": 0
+      },
+      "regex": {
+        "(TTAGGG)(.{1})(TTAGGG)": 0,
+        "(TTAGGG)(.{2})(TTAGGG)": 0
+      }
+    },
+    {
+      "start": 62001,
+      "end": 62963519,
+      "name": "inner_non_telomeric",
+      "motifs": {
+        "TTAGGG": 0,
+        "TCAGGG": 0,
+        "TGAGGG": 0,
+        "TTGGGG": 0
+      },
+      "regex": {
+        "(TTAGGG)(.{1})(TTAGGG)": 0,
+        "(TTAGGG)(.{2})(TTAGGG)": 0
+      }
+    }
+  ],
+  "chr21": [
+    {
+      "start": 9411194,
+      "end": 9413193,
+      "name": "p_telomere",
+      "motifs": {
+        "TTAGGG": 0,
+        "TCAGGG": 0,
+        "TGAGGG": 0,
+        "TTGGGG": 0
+      },
+      "regex": {
+        "(TTAGGG)(.{1})(TTAGGG)": 0,
+        "(TTAGGG)(.{2})(TTAGGG)": 0
+      }
+    },
+    {
+      "start": 48117788,
+      "end": 48119894,
+      "name": "q_telomere",
+      "motifs": {
+        "TTAGGG": 0,
+        "TCAGGG": 0,
+        "TGAGGG": 0,
+        "TTGGGG": 0
+      },
+      "regex": {
+        "(TTAGGG)(.{1})(TTAGGG)": 0,
+        "(TTAGGG)(.{2})(TTAGGG)": 0
+      }
+    },
+    {
+      "start": 9413194,
+      "end": 48117787,
+      "name": "inner_non_telomeric",
+      "motifs": {
+        "TTAGGG": 0,
+        "TCAGGG": 0,
+        "TGAGGG": 0,
+        "TTGGGG": 0
+      },
+      "regex": {
+        "(TTAGGG)(.{1})(TTAGGG)": 0,
+        "(TTAGGG)(.{2})(TTAGGG)": 0
+      }
+    }
+  ],
+  "chr22": [
+    {
+      "start": 16050001,
+      "end": 16052000,
+      "name": "p_telomere",
+      "motifs": {
+        "TTAGGG": 0,
+        "TCAGGG": 0,
+        "TGAGGG": 0,
+        "TTGGGG": 0
+      },
+      "regex": {
+        "(TTAGGG)(.{1})(TTAGGG)": 0,
+        "(TTAGGG)(.{2})(TTAGGG)": 0
+      }
+    },
+    {
+      "start": 51242566,
+      "end": 51244565,
+      "name": "q_telomere",
+      "motifs": {
+        "TTAGGG": 0,
+        "TCAGGG": 0,
+        "TGAGGG": 0,
+        "TTGGGG": 0
+      },
+      "regex": {
+        "(TTAGGG)(.{1})(TTAGGG)": 0,
+        "(TTAGGG)(.{2})(TTAGGG)": 0
+      }
+    },
+    {
+      "start": 16052001,
+      "end": 51242565,
+      "name": "inner_non_telomeric",
+      "motifs": {
+        "TTAGGG": 0,
+        "TCAGGG": 0,
+        "TGAGGG": 0,
+        "TTGGGG": 0
+      },
+      "regex": {
+        "(TTAGGG)(.{1})(TTAGGG)": 0,
+        "(TTAGGG)(.{2})(TTAGGG)": 0
+      }
+    }
+  ],
+  "chrX": [
+    {
+      "start": 60001,
+      "end": 62033,
+      "name": "p_telomere",
+      "motifs": {
+        "TTAGGG": 0,
+        "TCAGGG": 0,
+        "TGAGGG": 0,
+        "TTGGGG": 0
+      },
+      "regex": {
+        "(TTAGGG)(.{1})(TTAGGG)": 0,
+        "(TTAGGG)(.{2})(TTAGGG)": 0
+      }
+    },
+    {
+      "start": 155257733,
+      "end": 155260559,
+      "name": "q_telomere",
+      "motifs": {
+        "TTAGGG": 0,
+        "TCAGGG": 0,
+        "TGAGGG": 0,
+        "TTGGGG": 0
+      },
+      "regex": {
+        "(TTAGGG)(.{1})(TTAGGG)": 0,
+        "(TTAGGG)(.{2})(TTAGGG)": 0
+      }
+    },
+    {
+      "start": 62034,
+      "end": 155257732,
+      "name": "inner_non_telomeric",
+      "motifs": {
+        "TTAGGG": 0,
+        "TCAGGG": 0,
+        "TGAGGG": 0,
+        "TTGGGG": 0
+      },
+      "regex": {
+        "(TTAGGG)(.{1})(TTAGGG)": 0,
+        "(TTAGGG)(.{2})(TTAGGG)": 0
+      }
+    }
+  ],
+  "chrY": [
+    {
+      "start": 10001,
+      "end": 12033,
+      "name": "p_telomere",
+      "motifs": {
+        "TTAGGG": 0,
+        "TCAGGG": 0,
+        "TGAGGG": 0,
+        "TTGGGG": 0
+      },
+      "regex": {
+        "(TTAGGG)(.{1})(TTAGGG)": 0,
+        "(TTAGGG)(.{2})(TTAGGG)": 0
+      }
+    },
+    {
+      "start": 59360739,
+      "end": 59363565,
+      "name": "q_telomere",
+      "motifs": {
+        "TTAGGG": 0,
+        "TCAGGG": 0,
+        "TGAGGG": 0,
+        "TTGGGG": 0
+      },
+      "regex": {
+        "(TTAGGG)(.{1})(TTAGGG)": 0,
+        "(TTAGGG)(.{2})(TTAGGG)": 0
+      }
+    },
+    {
+      "start": 12034,
+      "end": 59360738,
+      "name": "inner_non_telomeric",
+      "motifs": {
+        "TTAGGG": 0,
+        "TCAGGG": 0,
+        "TGAGGG": 0,
+        "TTGGGG": 0
+      },
+      "regex": {
+        "(TTAGGG)(.{1})(TTAGGG)": 0,
+        "(TTAGGG)(.{2})(TTAGGG)": 0
+      }
+    }
+  ],
+  "unmapped": [
+    {
+      "start": 0,
+      "end": 0,
+      "name": "_other",
+      "motifs": {
+        "TTAGGG": 0,
+        "TCAGGG": 0,
+        "TGAGGG": 0,
+        "TTGGGG": 0
+      },
+      "regex": {
+        "(TTAGGG)(.{1})(TTAGGG)": 0,
+        "(TTAGGG)(.{2})(TTAGGG)": 0
+      }
+    }
+  ]
+}
