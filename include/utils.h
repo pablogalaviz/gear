@@ -34,6 +34,8 @@
 #include <chrono>
 #include "logger.h"
 #include <stdlib.h>
+#include <vector>
+#include <thread>
 
 
 namespace cmri {
@@ -197,6 +199,26 @@ namespace cmri {
         }
         return result;
     }
+
+    struct options_t{
+        std::string input_file;
+        bool validate_sequence;
+        int progress;
+        int chunk_size;
+        int threads;
+        int quality_value;
+        int quality_map;
+
+        void validate(){
+            int max_threads= static_cast<int>(std::thread::hardware_concurrency());
+            threads=cmri::clip(threads,1,max_threads);
+            progress = std::max(progress,0);
+            cmri::open_file(input_file);
+            quality_value = cmri::clip(quality_value,0,92);
+            quality_map = cmri::clip(quality_map,0,254);
+        }
+    };
+
 
 
 }

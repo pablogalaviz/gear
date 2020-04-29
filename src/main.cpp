@@ -41,22 +41,25 @@ int main(const int ac, char *av[]) {
         boost::program_options::options_description genericOptions(
                 "GEAR, Genomic sEquence AnalyzeR.  \nAllowed options:");
 
-        std::string input_file;
         std::string output_path;
         std::string motif_file;
-        int progress;
+        cmri::options_t options;
         bool backup;
-        bool validate;
         genericOptions.add_options()
                 ("backup,b", boost::program_options::value<bool>(&backup)->default_value(true),"Create a backup of previous output")
+                ("chunk_size,c", boost::program_options::value<int>(&options.chunk_size)->default_value(10000), "Size of the reading chuck")
+                ("debug,d", "Shows debug messages in log")
                 ("help,h", "Shows a help message")
-                ("input,i", boost::program_options::value<std::string>(&input_file), "Input file")
-                ("validate,v", boost::program_options::value<bool>(&validate)->default_value(false),"Validate sequences (slow)")
-                ("progress,p", boost::program_options::value<int>(&progress)->default_value(0), "Show progress message every X records (0 - off)")
-                ("output,o", boost::program_options::value<std::string>(&output_path)->default_value("output"),"Output directory name")
+                ("input,i", boost::program_options::value<std::string>(&options.input_file), "Input file")
                 ("motifs,m", boost::program_options::value<std::string>(&motif_file),"Motif per region definition in json format")
+                ("output,o", boost::program_options::value<std::string>(&output_path)->default_value("output"),"Output directory name")
+                ("progress,p", boost::program_options::value<int>(&options.progress)->default_value(0), "Show progress message every X records (0 - off)")
+                ("quality_value", boost::program_options::value<int>(&options.quality_value)->default_value(0), "Mean base quality threshold")
+                ("quality_map", boost::program_options::value<int>(&options.quality_map)->default_value(0), "Quality Mapping threshold")
                 ("silent,s", "Shows only errors")
-                ("debug,d", "Shows debug messages in log");
+                ("threads,t", boost::program_options::value<int>(&options.threads)->default_value(1),"Number of threads")
+                ("validate,v", boost::program_options::value<bool>(&options.validate_sequence)->default_value(false),"Validate sequences (slow)")
+                ;
 
         boost::program_options::options_description cmdlineOptions;
         cmdlineOptions.add(genericOptions);
@@ -96,9 +99,11 @@ int main(const int ac, char *av[]) {
 
         cmri::show_options(vm);
 
-        cmri::open_file(input_file);
         auto m_file = cmri::open_file(motif_file);
         std::map<std::string, cmri::region_list_t> motifs = cmri::deserialize(motif_file);
+
+        options.validate();
+
 
         if (motifs.empty()) {
             cmri::LOGGER.error << "From: " << __FILE__ << ":" << __LINE__ << std::endl;
@@ -106,10 +111,9 @@ int main(const int ac, char *av[]) {
             return (EINVAL);
         }
 
-        progress = std::max(progress,0);
 
         std::string output_file = output_path + "/output.csv";
-        cmri::format_t format = cmri::file_format(input_file);
+        cmri::format_t format = cmri::file_format(options.input_file);
         switch (format) {
 
             case cmri::UNKNOWN:
@@ -120,16 +124,36 @@ int main(const int ac, char *av[]) {
             case cmri::FASTQ:
             case cmri::FASTA_GZ:
             case cmri::FASTQ_GZ:
-                cmri::processFast(input_file, motifs, validate,progress);
+                if(options.threads >1) {
+                    cmri::processFastMultiThreading(options, motifs);
+                }
+                else{
+                    cmri::processFast(options, motifs);
+                }
                 break;
             case cmri::CSV:
-                cmri::processCsv(input_file, motifs, validate,progress);
+                if(options.threads >1) {
+                    cmri::processCsvMultiThreading(options, motifs);
+                }
+                else{
+                    cmri::processCsv(options, motifs);
+                }
                 break;
             case cmri::CSV_GZ:
-                cmri::processCsv(input_file, motifs, validate, progress,true);
+                if(options.threads >1) {
+                    cmri::processCsvMultiThreading(options, motifs,true);
+                }
+                else{
+                    cmri::processCsv(options, motifs, true);
+                }
                 break;
             case cmri::BAM:
-                cmri::processBam(input_file, motifs, validate,progress);
+                if(options.threads >1) {
+                    cmri::processBamMultiThreading(options, motifs);
+                }
+                else{
+                    cmri::processBam(options, motifs);
+                }
                 break;
         }
 

@@ -44,15 +44,36 @@ namespace cmri{
             double l_other = static_cast<double>(other_start-start)/(end-start);
             double r_other = static_cast<double>(other_end-start)/(end-start);
             if(l_other >= 0 && r_other <= 1 ){return true;} //fully inside region
-/*
-            double l_this = static_cast<double>(other_end-start) / (other_end - other_start);
-            if(l_other < 0 ) {return l_this > 0.90;} //true if outside on the left for less than 25%
-
-            double r_this = static_cast<double>(end - other_start) / (other_end - other_start);
-            if(r_other > 1 ) {return r_this > 0.90;} //outside on the left for less than 25%
-*/
             return false; // any other case is outside.
         }
+
+        inline void resetCount(){
+            for(auto &m : motifs){m.second=0;}
+            for(auto &r : regex){r.second=0;}
+        }
+
+        bool operator==(const region_t &rhs) const {
+            return start == rhs.start &&
+                   end == rhs.end &&
+                   name == rhs.name;
+        }
+
+        bool operator!=(const region_t &rhs) const {
+            return !(rhs == *this);
+        }
+
+        void operator+=(region_t &rhs)  {
+            if(start == rhs.start &&
+               end == rhs.end &&
+               name == rhs.name){
+               for(auto &m : motifs){m.second+=rhs.motifs[m.first];}
+                for(auto &r : regex){r.second+=rhs.regex[r.first];}
+            }
+            else{
+                throw std::runtime_error("error regions are not match ");
+            }
+        }
+
 
     };
 

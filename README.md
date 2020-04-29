@@ -24,8 +24,16 @@ git clone repository
     > sudo ./b2 install 
     ```
 2. Install HSTlib (default location /usr/)
+    ```
+   > wget https://github.com/samtools/htslib/releases/download/1.10.2/htslib-1.10.2.tar.bz2
+   > bzip2 -d htslib-1.10.2.tar.bz2
+   > tar -xvf htslib-1.10.2.tar
+   > cd htslib-1.10.2
+   > ./configure --prefix=/where/to/install
+   > make
+   > (sudo) make install 
+    ``` 
 
-    Follow the [instructions](https://github.com/samtools/htslib)
 
 ## Installation
 Edit library paths in CMakeList.txt if necessary. 

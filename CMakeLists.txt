@@ -37,6 +37,7 @@ set(HTSLIB_LIBRARY "-lhts")
 include_directories(${HTSLIB_INCLUDE_DIR})
 
 find_package(ZLIB REQUIRED)
+find_package (Threads REQUIRED)
 
-target_link_libraries(gear ${Boost_LIBRARIES} ${HTSLIB_LIBRARY} ZLIB::ZLIB)
+target_link_libraries(gear ${Boost_LIBRARIES} ${HTSLIB_LIBRARY} ZLIB::ZLIB ${CMAKE_THREAD_LIBS_INIT})
 add_subdirectory(${PROJECT_SOURCE_DIR}/test)
