@@ -149,6 +149,7 @@ namespace cmri {
                 for (auto &r : item.regex) {
                     r.second += searchRegex(sequence, r.first, options.validate_sequence);
                 }
+                item.count++;
             }
 
             count++;
@@ -180,6 +181,7 @@ namespace cmri {
                 for (auto &r : item.regex) {
                     r.second += searchRegex(seq, r.first, validate);
                 }
+                item.count++;
             }
         }
 
@@ -334,6 +336,7 @@ namespace cmri {
                 for (auto &r : item.regex) {
                     r.second += searchRegex(field["sequence"], r.first, options.validate_sequence);
                 }
+                item.count++;
             }
 
 
@@ -428,6 +431,7 @@ namespace cmri {
                     for (auto &r : item.regex) {
                         r.second += searchRegex(sequence, r.first, options.validate_sequence);
                     }
+                    item.count++;
                 }
             } else {
                 if (motif_map.find("other") != motif_map.end()) {
@@ -438,6 +442,7 @@ namespace cmri {
                         for (auto &r : item.regex) {
                             r.second += searchRegex(sequence, r.first, options.validate_sequence);
                         }
+                        item.count++;
                     }
                 }
             }
@@ -481,6 +486,7 @@ namespace cmri {
                     for (auto &r : item.regex) {
                         r.second += searchRegex(seq.sequence, r.first, validate);
                     }
+                    item.count++;
                 }
             } else {
                 if (motif_map.find("other") != motif_map.end()) {
@@ -491,6 +497,7 @@ namespace cmri {
                         for (auto &r : item.regex) {
                             r.second += searchRegex(seq.sequence, r.first, validate);
                         }
+                        item.count++;
                     }
                 }
             }
@@ -540,7 +547,7 @@ namespace cmri {
                     ) { continue; }
 
             //contig name (chromosome)
-            std::string chromosome = chromosome_id >= 0 ? bam_header->target_name[chromosome_id] : "unknown";
+            std::string chromosome = chromosome_id >= 0 ? bam_header->target_name[chromosome_id] : "unmapped";
 
             auto query_name = bam_get_qname(alignment);
 

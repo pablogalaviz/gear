@@ -107,18 +107,18 @@ void cmri::goodbye( std::chrono::system_clock::time_point start){
     auto delta_seconds = std::chrono::duration_cast<std::chrono::seconds>(stop - start).count();
     auto delta_milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start).count();
 
-    int delta_days = int(delta_hours/24);
-    delta_hours -= delta_days*24;
-    delta_minutes -= delta_hours*60;
-    delta_seconds -= delta_minutes*60;
-    delta_milliseconds -= delta_seconds*1000;
+    int days = int(delta_hours/24);
+    int hours = delta_hours-days*24;
+    int minutes = delta_minutes - delta_hours*60;
+    int seconds = delta_seconds - delta_minutes*60;
+    int milliseconds = delta_milliseconds - delta_seconds*1000;
 
     cmri::LOGGER.info << "Finished in "
-                      << get_time_str(delta_days, "day")
-                      << get_time_str(delta_hours, "hour")
-                      << get_time_str(delta_minutes, "minute")
-                      << get_time_str(delta_seconds, "second")
-                      << delta_milliseconds << " milliseconds " << std::endl;
+                      << get_time_str(days, "day")
+                      << get_time_str(hours, "hour")
+                      << get_time_str(minutes, "minute")
+                      << get_time_str(seconds, "second")
+                      << milliseconds << " milliseconds " << std::endl;
 
     cmri::LOGGER.info << "All done! " << std::endl;
 

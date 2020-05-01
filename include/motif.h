@@ -36,11 +36,13 @@ namespace cmri{
     struct region_t {
         unsigned int start=0;
         unsigned int end=0;
+        unsigned int count=0;
         std::string name;
         std::map<std::string,unsigned int> motifs;
         std::map<std::string,unsigned int> regex;
 
         inline bool intersect(const unsigned int other_start,const unsigned int other_end ){
+            if(start==end){return true;}
             double l_other = static_cast<double>(other_start-start)/(end-start);
             double r_other = static_cast<double>(other_end-start)/(end-start);
             if(l_other >= 0 && r_other <= 1 ){return true;} //fully inside region
@@ -50,12 +52,14 @@ namespace cmri{
         inline void resetCount(){
             for(auto &m : motifs){m.second=0;}
             for(auto &r : regex){r.second=0;}
+            count=0;
         }
 
         bool operator==(const region_t &rhs) const {
             return start == rhs.start &&
                    end == rhs.end &&
-                   name == rhs.name;
+                   name == rhs.name &&
+                   count == rhs.count;
         }
 
         bool operator!=(const region_t &rhs) const {
@@ -68,6 +72,7 @@ namespace cmri{
                name == rhs.name){
                for(auto &m : motifs){m.second+=rhs.motifs[m.first];}
                 for(auto &r : regex){r.second+=rhs.regex[r.first];}
+                count += rhs.count;
             }
             else{
                 throw std::runtime_error("error regions are not match ");
@@ -109,6 +114,7 @@ typedef std::map<std::string,region_list_t> chromosome_map_t;
                 region_t new_region;
                 new_region.start = item.second.get<unsigned int>("start");
                 new_region.end = item.second.get<unsigned int>("end");
+                new_region.count = item.second.get<unsigned int>("count");
                 new_region.name = item.second.get<std::string>("name");
                 new_region.motifs = get_patterns(item.second,"motifs");
                 new_region.regex = get_patterns(item.second,"regex");
@@ -160,6 +166,7 @@ typedef std::map<std::string,region_list_t> chromosome_map_t;
                 file << "{";
                 file << "\"start\":" << v.start <<"," ;
                 file << "\"end\":" << v.end <<",";
+                file << "\"count\":" << v.count <<",";
                 file << "\"name\":\"" << v.name <<"\"," ;
                 file << "\"motifs\": {" ;
                 for(auto motif_iter = v.motifs.begin(); motif_iter != v.motifs.end(); ++motif_iter){

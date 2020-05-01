@@ -30,10 +30,16 @@ endif()
 
 
 #HSTlib SETUP
-message(Warning " Manually setting htslib up.")
-set(HTSLIB_INCLUDE_DIR "/usr/include/htslib/")
-set(HTSLIB_LIBRARY "-lhts")
+message(STATUS "Manually setting htslib up.")
+if(EXISTS "/usr/include/htslib/")
+    message(STATUS "Found htslib: /usr/include/htslib/")
+    set(HTSLIB_INCLUDE_DIR "/usr/include/htslib/")
+elseif(EXISTS "/usr/local/include/htslib/")
+    message(STATUS "Found htslib: /usr/local/include/htslib/")
+    set(HTSLIB_INCLUDE_DIR "/usr/local/include/htslib/")
+endif()
 
+set(HTSLIB_LIBRARY "-lhts")
 include_directories(${HTSLIB_INCLUDE_DIR})
 
 find_package(ZLIB REQUIRED)
