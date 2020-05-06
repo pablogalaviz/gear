@@ -381,9 +381,6 @@ namespace cmri {
         while (sam_read1(file, bam_header, alignment) > 0) {
             int chromosome_id = alignment->core.tid;
 
-            //if (chromosome_id < 0) {continue;}
-
-
             if ((alignment->core.flag & BAM_FSECONDARY)
                 || (alignment->core.flag & BAM_FDUP)
                 || (alignment->core.flag & BAM_FQCFAIL)
@@ -416,8 +413,14 @@ namespace cmri {
             mean_qv/=len;
             uint32_t mapping_quality = alignment->core.qual;
 
-            if(mapping_quality < options.quality_map || mean_qv < options.quality_value) {
-                chromosome = "fail";
+            if(chromosome_id >= 0) {
+                if(mapping_quality < options.quality_map) {chromosome = "mapq_fail";}
+                else {
+                    if(mean_qv < options.quality_value){ chromosome = "qv_fail";}
+                }
+            }
+            else{
+                LOGGER.debug << "unmapped " << std::endl;
             }
 
             if (motif_map.find(chromosome) != motif_map.end()) {
@@ -567,8 +570,14 @@ namespace cmri {
             mean_qv/=len;
             uint32_t mapping_quality = alignment->core.qual;
 
-            if(mapping_quality < options.quality_map || mean_qv < options.quality_value) {
-                chromosome = "fail";
+            if(chromosome_id >= 0) {
+                if(mapping_quality < options.quality_map) {chromosome = "mapq_fail";}
+                else {
+                    if(mean_qv < options.quality_value){ chromosome = "qv_fail";}
+                }
+            }
+            else{
+                LOGGER.debug << "unmapped " << std::endl;
             }
 
             sequences[count % options.threads].emplace_back(bam_seq_t(sequence, start, end, chromosome));
