@@ -1,0 +1,95 @@
+{
+  "mapq_fail": [
+    {
+      "start": 0,
+      "end": 0,
+      "count": 0,
+      "total_bases": 0,
+      "name": "mapq_fail",
+      "motifs": {
+        "CCCTAA": 0,
+        "CCCTGA": 0
+      },
+      "regex": {}
+    }
+  ],
+  "motif_test": [
+    {
+      "start": 1,
+      "end": 10000,
+      "count": 0,
+      "total_bases": 0,
+      "name": "motif_test",
+      "motifs": {
+        "CCCTAA": 0,
+        "CCCTGA": 0
+      },
+      "regex": {}
+    }
+  ],
+  "other": [
+    {
+      "start": 0,
+      "end": 0,
+      "count": 0,
+      "total_bases": 0,
+      "name": "other",
+      "motifs": {
+        "CCCTAA": 0,
+        "CCCTGA": 0
+      },
+      "regex": {}
+    }
+  ],
+  "qv_fail": [
+    {
+      "start": 0,
+      "end": 0,
+      "count": 1,
+      "total_bases": 320,
+      "name": "qv_fail",
+      "motifs": {
+        "CCCTAA": 8,
+        "CCCTGA": 5
+      },
+      "regex": {}
+    }
+  ],
+  "regex_test": [
+    {
+      "start": 1400,
+      "end": 2800,
+      "count": 0,
+      "total_bases": 0,
+      "name": "regex_test",
+      "motifs": {},
+      "regex": {
+        "(TCAGGG){1}(TTAGGG){2}": 0,
+        "(TTAGGG)(.{1})(TCAGGG)": 0,
+        "(TTAGGG)(.{3})(TCAGGG)": 0,
+        "A(.{1})AGGG": 0,
+        "A(.{2})AGGG": 0
+      }
+    }
+  ],
+  "unmapped": [
+    {
+      "start": 0,
+      "end": 0,
+      "count": 5,
+      "total_bases": 805,
+      "name": "unmapped",
+      "motifs": {
+        "CCCTAA": 12,
+        "CCCTGA": 10
+      },
+      "regex": {
+        "(TCAGGG){1}(TTAGGG){2}": 2,
+        "(TTAGGG)(.{1})(TCAGGG)": 3,
+        "(TTAGGG)(.{3})(TCAGGG)": 6,
+        "A(.{1})AGGG": 3,
+        "A(.{2})AGGG": 12
+      }
+    }
+  ]
+}
