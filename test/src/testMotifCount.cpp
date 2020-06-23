@@ -45,5 +45,54 @@ BOOST_AUTO_TEST_SUITE(motifCountTest)
 
     }
 
+    std::string sample_input[] = {"data/input.fq",
+                                        "data/input.bam"
+    };
+
+    std::string sample_result[] = {"data/result.json",
+                                        "data/bam_result.json"
+    };
+
+
+    BOOST_DATA_TEST_CASE(processTest,boost::unit_test::data::make(sample_input)^sample_result,input_file,result_file){
+
+        std::string motif_file = "data/input.json";
+        std::map<std::string, cmri::region_list_t> motifs = cmri::deserialize(motif_file);
+        std::map<std::string, cmri::region_list_t> result = cmri::deserialize(result_file);
+        cmri::options_t options;
+        options.input_file=input_file;
+        options.quality_value=10;
+        options.quality_map=30;
+        cmri::process(options, motifs);
+
+        for(auto &m : motifs){
+            BOOST_TEST(result[m.first]==m.second);
+        }
+
+        BOOST_TEST(motifs == result);
+    }
+
+
+    BOOST_DATA_TEST_CASE(processMultiThreadingTest,boost::unit_test::data::make(sample_input)^sample_result,input_file,result_file){
+
+        std::string motif_file = "data/input.json";
+        std::map<std::string, cmri::region_list_t> motifs = cmri::deserialize(motif_file);
+        std::map<std::string, cmri::region_list_t> result = cmri::deserialize(result_file);
+        cmri::options_t options;
+        options.input_file=input_file;
+        options.quality_value=10;
+        options.quality_map=30;
+        options.threads = static_cast<int>(std::thread::hardware_concurrency());
+        options.chunk_size = 1;
+        cmri::processMultiThreading(options, motifs);
+
+        for(auto &m : motifs){
+            BOOST_TEST(result[m.first]==m.second);
+        }
+
+
+        BOOST_TEST(motifs == result);
+    }
+
 
 BOOST_AUTO_TEST_SUITE_END()

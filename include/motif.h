@@ -37,6 +37,7 @@ namespace cmri{
         unsigned int start=0;
         unsigned int end=0;
         unsigned int count=0;
+        unsigned int total_bases=0;
         std::string name;
         std::map<std::string,unsigned int> motifs;
         std::map<std::string,unsigned int> regex;
@@ -53,13 +54,15 @@ namespace cmri{
             for(auto &m : motifs){m.second=0;}
             for(auto &r : regex){r.second=0;}
             count=0;
+            total_bases=0;
         }
 
         bool operator==(const region_t &rhs) const {
             return start == rhs.start &&
                    end == rhs.end &&
                    name == rhs.name &&
-                   count == rhs.count;
+                   count == rhs.count&&
+                   total_bases == rhs.total_bases;
         }
 
         bool operator!=(const region_t &rhs) const {
@@ -73,6 +76,7 @@ namespace cmri{
                for(auto &m : motifs){m.second+=rhs.motifs[m.first];}
                 for(auto &r : regex){r.second+=rhs.regex[r.first];}
                 count += rhs.count;
+                total_bases+= rhs.total_bases;
             }
             else{
                 throw std::runtime_error("error regions are not match ");
@@ -115,6 +119,7 @@ typedef std::map<std::string,region_list_t> chromosome_map_t;
                 new_region.start = item.second.get<unsigned int>("start");
                 new_region.end = item.second.get<unsigned int>("end");
                 new_region.count = item.second.get<unsigned int>("count");
+                new_region.total_bases = item.second.get<unsigned int>("total_bases");
                 new_region.name = item.second.get<std::string>("name");
                 new_region.motifs = get_patterns(item.second,"motifs");
                 new_region.regex = get_patterns(item.second,"regex");
@@ -167,6 +172,7 @@ typedef std::map<std::string,region_list_t> chromosome_map_t;
                 file << "\"start\":" << v.start <<"," ;
                 file << "\"end\":" << v.end <<",";
                 file << "\"count\":" << v.count <<",";
+                file << "\"total_bases\":" << v.total_bases <<",";
                 file << "\"name\":\"" << v.name <<"\"," ;
                 file << "\"motifs\": {" ;
                 for(auto motif_iter = v.motifs.begin(); motif_iter != v.motifs.end(); ++motif_iter){

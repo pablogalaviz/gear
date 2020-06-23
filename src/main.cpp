@@ -111,57 +111,16 @@ int main(const int ac, char *av[]) {
             return (EINVAL);
         }
 
-
         std::string output_file = output_path + "/output.csv";
-        cmri::format_t format = cmri::file_format(options.input_file);
-        switch (format) {
 
-            case cmri::UNKNOWN:
-                cmri::LOGGER.error << "Unknown input file format " << std::endl;
-                return EINVAL;
-                break;
-            case cmri::FASTA:
-            case cmri::FASTQ:
-            case cmri::FASTA_GZ:
-            case cmri::FASTQ_GZ:
-                if(options.threads >1) {
-                    cmri::processFastMultiThreading(options, motifs);
-                }
-                else{
-                    cmri::processFast(options, motifs);
-                }
-                break;
-            case cmri::CSV:
-                if(options.threads >1) {
-                    cmri::processCsvMultiThreading(options, motifs);
-                }
-                else{
-                    cmri::processCsv(options, motifs);
-                }
-                break;
-            case cmri::CSV_GZ:
-                if(options.threads >1) {
-                    cmri::processCsvMultiThreading(options, motifs,true);
-                }
-                else{
-                    cmri::processCsv(options, motifs, true);
-                }
-                break;
-            case cmri::BAM:
-                if(options.threads >1) {
-                    cmri::processBamMultiThreading(options, motifs);
-                }
-                else{
-                    cmri::processBam(options, motifs);
-                }
-                break;
+        if (options.threads > 1) {
+            cmri::processMultiThreading(options, motifs);
+        } else {
+            cmri::process(options, motifs);
         }
 
-
         cmri::serialize(output_path + "/output.json", motifs);
-
         cmri::goodbye(start_time);
-
 
     }
     catch (std::exception &e) {

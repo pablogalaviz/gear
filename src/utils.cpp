@@ -77,6 +77,7 @@ void cmri::welcome(const std::string &code_name)
     LOGGER.info << " " << code_name << std::endl;
     LOGGER.info << " Author: Pablo Galaviz             " << std::endl;
     LOGGER.info << " pgalaviz@cmri.org.au              " << std::endl;
+    LOGGER.info << " Build: " << __DATE__ << " " << __TIME__ << std::endl;
     LOGGER.info << " ==============================================" << std::endl;
     LOGGER.info << "" << std::endl;
     LOGGER.info << "" << std::endl;

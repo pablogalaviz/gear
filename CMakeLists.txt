@@ -10,11 +10,12 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
 set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -O0")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0")
 
+
 include_directories("${PROJECT_SOURCE_DIR}/include")
 
 
 #EXEC SETUP
-add_executable(gear src/main.cpp include/kseq.h include/utils.h include/logger.h src/utils.cpp include/csvParser.h include/motifCount.h include/motif.h) #kernels.cuh ${KERNEL_O}
+add_executable(gear src/main.cpp include/kseq.h include/utils.h include/logger.h src/utils.cpp include/csvParser.h include/motifCount.h include/motif.h src/sequenceReader.cpp include/sequenceReader.h src/sequenceNetwork.cpp include/sequenceNetwork.h src/kmerNode.cpp include/kmerNode.h) #kernels.cuh ${KERNEL_O}
 
 #BOOST SETUP
 set(BOOST_ROOT "/opt/boost")
@@ -47,3 +48,4 @@ find_package (Threads REQUIRED)
 
 target_link_libraries(gear ${Boost_LIBRARIES} ${HTSLIB_LIBRARY} ZLIB::ZLIB ${CMAKE_THREAD_LIBS_INIT})
 add_subdirectory(${PROJECT_SOURCE_DIR}/test)
+

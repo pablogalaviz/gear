@@ -36,13 +36,14 @@
 #include <stdlib.h>
 #include <vector>
 #include <thread>
+#include <sam.h>
 
 
 namespace cmri {
 
 
     enum format_t : int {
-        UNKNOWN = 0, FASTA = 1, FASTA_GZ = 2, FASTQ = 3, FASTQ_GZ = 4, CSV = 5, CSV_GZ = 6, BAM = 7
+        UNKNOWN = 0b0000'0000, FASTA = 0b0000'0001, CSV = 0b0000'0010, FASTQ = 0b0000'0100, BAM = 0b0000'1000, GZIP = 0b0001'0000 , FILE_TYPE = 0b0000'1111, FASTA_GZ = 0b0001'0001, CSV_GZ = 0b0001'0010, FASTQ_GZ = 0b0001'0100
     };
 
     inline format_t file_format(std::string name) {
@@ -168,34 +169,53 @@ namespace cmri {
 
     }
 
+    inline int get_total_reads(samFile *bam_file, bam_hdr_t *bam_header ){
 
-    inline int count_lines(const std::string &file_name) {
+        std::string index_file_name = bam_file->fn;
+        index_file_name += ".bai";
+        open_file(index_file_name).close(); // check if file exists
+        auto bam_index = sam_index_load(bam_file, index_file_name.c_str());
+        auto n_targets = bam_header->n_targets;
+        int result = 0;
+        for (int tid = 0; tid < n_targets; tid++) {
+            uint64_t mapped;
+            uint64_t unmapped;
+            if (hts_idx_get_stat(bam_index, tid, &mapped, &unmapped) == 0) {
+                result += static_cast<int>(mapped + unmapped);
+            }
+        }
+
+        hts_idx_destroy(bam_index);
+        return result;
+    }
+
+    inline int count_reads(const std::string &file_name) {
 
         int result = 0;
-        format_t format = file_format(file_name);
-        switch (format) {
-            case FASTA :
-            case FASTQ :
-            case CSV :
-                {
-                std::ifstream file(file_name);
-                result = std::count(std::istreambuf_iterator<char>(file), std::istreambuf_iterator<char>(), '\n');
-                }
-                break;
-            case FASTA_GZ :
-            case FASTQ_GZ :
-            case CSV_GZ :
-                {
-                std::ifstream file(file_name, std::ios_base::in | std::ios_base::binary);
-                boost::iostreams::filtering_streambuf<boost::iostreams::input> inbuf;
-                inbuf.push(boost::iostreams::gzip_decompressor());
-                inbuf.push(file);
-                //Convert streambuf to istream
-                std::istream instream(&inbuf);
-                result=std::count(std::istreambuf_iterator<char>(instream), std::istreambuf_iterator<char>(), '\n');
+        int format = file_format(file_name);
 
-                }
-                break;
+        char token = (format&format_t::FASTA)  ? '>' :'\n';
+        int factor = (format&format_t::FASTQ ) ? 4 : 1;
+
+        if(format == BAM) {
+            samFile *bam_file = hts_open(file_name.c_str(), "r");
+            bam_hdr_t *bam_header = sam_hdr_read(bam_file); //read header
+            return get_total_reads(bam_file, bam_header);
+        }
+        if( format&format_t::GZIP&(format_t::FASTA|format_t::FASTQ|format_t::CSV) ){
+
+            std::ifstream file(file_name, std::ios_base::in | std::ios_base::binary);
+            boost::iostreams::filtering_streambuf<boost::iostreams::input> inbuf;
+            inbuf.push(boost::iostreams::gzip_decompressor());
+            inbuf.push(file);
+            //Convert streambuf to istream
+            std::istream instream(&inbuf);
+            return std::count(std::istreambuf_iterator<char>(instream), std::istreambuf_iterator<char>(), token)/factor;
+        }
+        if (format & (format_t::FASTA | format_t::FASTQ | format_t::CSV)) {
+            std::ifstream file(file_name);
+            return std::count(std::istreambuf_iterator<char>(file), std::istreambuf_iterator<char>(), token) /
+                   factor;
         }
         return result;
     }
@@ -203,11 +223,11 @@ namespace cmri {
     struct options_t{
         std::string input_file;
         bool validate_sequence;
-        int progress;
-        int chunk_size;
-        int threads;
-        int quality_value;
-        int quality_map;
+        int progress=0;
+        int chunk_size=1;
+        int threads=1;
+        int quality_value=0;
+        int quality_map=0;
 
         void validate(){
             int max_threads= static_cast<int>(std::thread::hardware_concurrency());

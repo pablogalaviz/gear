@@ -20,6 +20,17 @@ include_directories(${HTSLIB_INCLUDE_DIR})
 find_package(ZLIB)
 find_package (Threads REQUIRED)
 
+configure_file(${PROJECT_SOURCE_DIR}/test/data/par/input.json ${CMAKE_CURRENT_BINARY_DIR}/data/input.json COPYONLY)
+configure_file(${PROJECT_SOURCE_DIR}/test/data/par/transition_matrix.csv ${CMAKE_CURRENT_BINARY_DIR}/data/transition_matrix.csv COPYONLY)
+configure_file(${PROJECT_SOURCE_DIR}/test/data/input/input.fq ${CMAKE_CURRENT_BINARY_DIR}/data/input.fq COPYONLY)
+configure_file(${PROJECT_SOURCE_DIR}/test/data/input/input.fq.gz ${CMAKE_CURRENT_BINARY_DIR}/data/input.fq.gz COPYONLY)
+configure_file(${PROJECT_SOURCE_DIR}/test/data/input/input.csv ${CMAKE_CURRENT_BINARY_DIR}/data/input.csv COPYONLY)
+configure_file(${PROJECT_SOURCE_DIR}/test/data/input/input.bam ${CMAKE_CURRENT_BINARY_DIR}/data/input.bam COPYONLY)
+configure_file(${PROJECT_SOURCE_DIR}/test/data/input/input.bam.bai ${CMAKE_CURRENT_BINARY_DIR}/data/input.bam.bai COPYONLY)
+configure_file(${PROJECT_SOURCE_DIR}/test/data/output/result.json ${CMAKE_CURRENT_BINARY_DIR}/data/result.json COPYONLY)
+configure_file(${PROJECT_SOURCE_DIR}/test/data/output/bam_result.json ${CMAKE_CURRENT_BINARY_DIR}/data/bam_result.json COPYONLY)
+
+
 # Note: a target should be already defined using 'add_executable' or 'add_library'
-add_executable(Boost_Tests_run src/testMotifCount.cpp )
+add_executable(Boost_Tests_run src/testMotifCount.cpp src/testUtils.cpp src/testSequenceReader.cpp  ${PROJECT_SOURCE_DIR}/src/sequenceReader.cpp ../src/sequenceNetwork.cpp ../include/sequenceNetwork.h ../src/kmerNode.cpp ../include/kmerNode.h src/testKmerNode.cpp src/testSequenceNetwork.cpp)
 target_link_libraries(Boost_Tests_run ${Boost_LIBRARIES} ZLIB::ZLIB ${HTSLIB_LIBRARY} ${CMAKE_THREAD_LIBS_INIT})
