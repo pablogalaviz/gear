@@ -27,8 +27,10 @@
 #include <chrono>
 
 #include "csvParser.h"
-#include "motifCount.h"
+#include "Modules/MotifCount/motifCount.h"
+#include "Modules/VariantCallAnalysis/variantCallAnalysis.h"
 #include "utils.h"
+#include "options.h"
 
 
 int main(const int ac, char *av[]) {
@@ -38,40 +40,75 @@ int main(const int ac, char *av[]) {
 
         auto start_time = std::chrono::system_clock::now();
 
+        std::string task{};
+        std::string parameters;
         boost::program_options::options_description genericOptions(
-                "GEAR, Genomic sEquence AnalyzeR.  \nAllowed options:");
-
-        std::string output_path;
-        std::string motif_file;
-        cmri::options_t options;
-        bool backup;
+                "GEAR, Genomic sEquence AnalyzeR.  \nAllowed common:");
         genericOptions.add_options()
-                ("backup,b", boost::program_options::value<bool>(&backup)->default_value(true),"Create a backup of previous output")
-                ("chunk_size,c", boost::program_options::value<int>(&options.chunk_size)->default_value(10000), "Size of the reading chuck")
                 ("debug,d", "Shows debug messages in log")
                 ("help,h", "Shows a help message")
-                ("input,i", boost::program_options::value<std::string>(&options.input_file), "Input file")
-                ("motifs,m", boost::program_options::value<std::string>(&motif_file),"Motif per region definition in json format")
-                ("output,o", boost::program_options::value<std::string>(&output_path)->default_value("output"),"Output directory name")
-                ("progress,p", boost::program_options::value<int>(&options.progress)->default_value(0), "Show progress message every X records (0 - off)")
-                ("quality_value", boost::program_options::value<int>(&options.quality_value)->default_value(0), "Mean base quality threshold")
-                ("quality_map", boost::program_options::value<int>(&options.quality_map)->default_value(0), "Quality Mapping threshold")
-                ("silent,s", "Shows only errors")
-                ("threads,t", boost::program_options::value<int>(&options.threads)->default_value(1),"Number of threads")
-                ("validate,v", boost::program_options::value<bool>(&options.validate_sequence)->default_value(false),"Validate sequences (slow)")
+                ("task", boost::program_options::value<std::string>(&task), "Perform one of the following tasks: [MotifCount, TelomereAnalysis, VariantCallAnalysis]")
+                ("parameters,p", boost::program_options::value<std::string>(&parameters), "Parameters file")
+                ("silent,s", "Shows only errors");
+
+
+        cmri::common_options_t common;
+        boost::program_options::options_description commonOptions("Common Options:");
+        commonOptions.add_options()
+                ("common.backup", boost::program_options::value<bool>(&common.backup)->default_value(true), "Create a backup of previous output")
+                ("common.chunk_size", boost::program_options::value<int>(&common.chunk_size)->default_value(10000), "Size of the reading chuck")
+                ("common.input_file,i", boost::program_options::value<std::string>(&common.input_file), "Input file")
+                ("common.output_path,o", boost::program_options::value<std::string>(&common.output_path)->default_value("output"), "Output directory name")
+                ("common.progress", boost::program_options::value<int>(&common.progress)->default_value(0), "Show progress message every X records (0 - off)")
+                ("common.threads", boost::program_options::value<int>(&common.threads)->default_value(1), "Number of threads")
                 ;
 
+        cmri::motif_count_options_t motif_count;
+        boost::program_options::options_description motifCountOptions("Motif Count Options:");
+        motifCountOptions.add_options()
+                ("motif_count.motifs", boost::program_options::value<std::string>(&motif_count.motif_file), "Motif per region definition in json format")
+                ("motif_count.quality_value", boost::program_options::value<int>(&motif_count.quality_value)->default_value(0), "Mean base quality threshold")
+                ("motif_count.quality_map", boost::program_options::value<int>(&motif_count.quality_map)->default_value(0), "Quality Mapping threshold")
+                ("motif_count.validate", boost::program_options::value<bool>(&motif_count.validate_sequence)->default_value(false), "Validate sequences (slow)")
+        ;
+
+        cmri::variant_call_analysis_options_t variant_call_analysis;
+        boost::program_options::options_description variantCallAnalysisOptions("Variant Call Analysis Options:");
+        variantCallAnalysisOptions.add_options()
+                ("variant_call_analysis.regions", boost::program_options::value<std::string>(&variant_call_analysis.regions), "Motif per region definition in json format")
+                ;
+
+        boost::program_options::positional_options_description positional;
+        positional.add("task", 1);
+
         boost::program_options::options_description cmdlineOptions;
-        cmdlineOptions.add(genericOptions);
+        cmdlineOptions.add(genericOptions).add(commonOptions).add(motifCountOptions).add(variantCallAnalysisOptions);
+
+        boost::program_options::options_description configFileOptions;
+        configFileOptions.add(commonOptions).add(motifCountOptions).add(variantCallAnalysisOptions);
 
         boost::program_options::variables_map vm;
-        boost::program_options::store(boost::program_options::command_line_parser(ac, av).options(cmdlineOptions).run(),
-                                      vm);
+        boost::program_options::store(boost::program_options::command_line_parser(ac, av).options(cmdlineOptions).positional(positional).run(),vm);
         boost::program_options::notify(vm);
 
-        cmri::create_output_directory(output_path, backup);
-        cmri::log_command(output_path, ac, av);
-        std::string log_file = output_path + "/output.log";
+        if (vm.count("help") || vm.count("task") == 0 ) {
+            if (vm.count("task") == 0 && vm.count("help") == 0)
+                std::cout << "MISSING TASK OPTION!" << std::endl;
+            std::cerr << cmdlineOptions << std::endl;
+            return 0;
+        }
+
+        if (vm.count("parameters"))
+        {
+            auto par_file = cmri::open_file(parameters,"expecting parameters file");
+            store(parse_config_file(par_file, configFileOptions), vm);
+            notify(vm);
+        }
+
+
+        cmri::create_output_directory(common.output_path, common.backup);
+        cmri::log_command(common.output_path, ac, av);
+        std::string log_file = common.output_path + "/output.log";
 
         bool debug = vm.count("debug");
         bool silent = vm.count("silent");
@@ -86,40 +123,23 @@ int main(const int ac, char *av[]) {
 
         cmri::welcome("GEAR, Genomic sEquence AnalyzeR.");
 
-        if (vm.count("help") || vm.count("input") == 0 || vm.count("motifs") == 0) {
-            if (vm.count("input") == 0 && vm.count("help") == 0)
-                std::cout << "MISSING INPUT FILE!" << std::endl;
-            if (vm.count("motifs") == 0 && vm.count("help") == 0)
-                std::cout << "MISSING MOTIF FILE!" << std::endl;
-
-            std::cerr << cmdlineOptions << std::endl;
-            return 0;
-        }
-
-
         cmri::show_options(vm);
+        common.validate();
 
-        auto m_file = cmri::open_file(motif_file);
-        std::map<std::string, cmri::region_list_t> motifs = cmri::deserialize(motif_file);
-
-        options.validate();
-
-
-        if (motifs.empty()) {
-            cmri::LOGGER.error << "From: " << __FILE__ << ":" << __LINE__ << std::endl;
-            cmri::LOGGER.error << "Invalid argument. No valid motif list found!" << std::endl;
-            return (EINVAL);
+        if(task == "MotifCount") {
+            motif_count.validate();
+            cmri::mainMotifCount(common,motif_count);
+        }
+        else {
+            if (task == "VariantCallAnalysis") {
+                variant_call_analysis.validate();
+                cmri::mainVariantCallAnalysis(common, variant_call_analysis);
+            }else{
+                cmri::LOGGER.error << "Unknown task: " << task;
+                std::cerr << cmdlineOptions << std::endl;
+            }
         }
 
-        std::string output_file = output_path + "/output.csv";
-
-        if (options.threads > 1) {
-            cmri::processMultiThreading(options, motifs);
-        } else {
-            cmri::process(options, motifs);
-        }
-
-        cmri::serialize(output_path + "/output.json", motifs);
         cmri::goodbye(start_time);
 
     }

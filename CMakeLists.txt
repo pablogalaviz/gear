@@ -12,10 +12,13 @@ set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0")
 
 
 include_directories("${PROJECT_SOURCE_DIR}/include")
+include_directories("${PROJECT_SOURCE_DIR}/Modules/MotifCount")
+include_directories("${PROJECT_SOURCE_DIR}/Modules/TelomereAnalysis")
+include_directories("${PROJECT_SOURCE_DIR}/Modules/VariantCallAnalysis")
 
 
 #EXEC SETUP
-add_executable(gear src/main.cpp include/kseq.h include/utils.h include/logger.h src/utils.cpp include/csvParser.h include/motifCount.h include/motif.h src/sequenceReader.cpp include/sequenceReader.h src/sequenceNetwork.cpp include/sequenceNetwork.h src/kmerNode.cpp include/kmerNode.h) #kernels.cuh ${KERNEL_O}
+add_executable(gear src/main.cpp include/kseq.h include/utils.h include/logger.h src/utils.cpp include/csvParser.h src/Modules/MotifCount/motifCount.h src/Modules/MotifCount/motifRegion.h src/sequenceReader.cpp include/sequenceReader.h src/Modules/TelomereAnalysis/sequenceNetwork.cpp src/Modules/TelomereAnalysis/sequenceNetwork.h src/Modules/TelomereAnalysis/kmerNode.cpp src/Modules/TelomereAnalysis/kmerNode.h include/options.h src/Modules/VariantCallAnalysis/variantCallAnalysis.cpp src/Modules/VariantCallAnalysis/variantCallAnalysis.h src/Modules/MotifCount/motifCount.cpp src/Modules/MotifCount/motifRegion.cpp include/genomeRegion.h src/Modules/VariantCallAnalysis/variantRegion.cpp src/Modules/VariantCallAnalysis/variantRegion.h) #kernels.cuh ${KERNEL_O}
 
 #BOOST SETUP
 set(BOOST_ROOT "/opt/boost")

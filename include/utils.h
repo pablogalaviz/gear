@@ -34,8 +34,6 @@
 #include <chrono>
 #include "logger.h"
 #include <stdlib.h>
-#include <vector>
-#include <thread>
 #include <sam.h>
 
 
@@ -84,10 +82,11 @@ namespace cmri {
         return operand.type() == typeid(T);
     }
 
-    static std::ifstream open_file(const std::string &file_name) {
+    static std::ifstream open_file(const std::string &file_name, const std::string &error_message) {
         std::ifstream ifs(file_name.c_str());
         if (!ifs) {
             LOGGER.error << "No such file or directory: " << file_name << std::endl;
+            LOGGER.error << error_message << std::endl;
             exit(ENOENT);
         }
         return ifs;
@@ -173,7 +172,7 @@ namespace cmri {
 
         std::string index_file_name = bam_file->fn;
         index_file_name += ".bai";
-        open_file(index_file_name).close(); // check if file exists
+        open_file(index_file_name,"expecting bam index").close(); // check if file exists
         auto bam_index = sam_index_load(bam_file, index_file_name.c_str());
         auto n_targets = bam_header->n_targets;
         int result = 0;
@@ -219,26 +218,6 @@ namespace cmri {
         }
         return result;
     }
-
-    struct options_t{
-        std::string input_file;
-        bool validate_sequence;
-        int progress=0;
-        int chunk_size=1;
-        int threads=1;
-        int quality_value=0;
-        int quality_map=0;
-
-        void validate(){
-            int max_threads= static_cast<int>(std::thread::hardware_concurrency());
-            threads=cmri::clip(threads,1,max_threads);
-            progress = std::max(progress,0);
-            cmri::open_file(input_file);
-            quality_value = cmri::clip(quality_value,0,92);
-            quality_map = cmri::clip(quality_map,0,254);
-        }
-    };
-
 
 
 }

@@ -3,7 +3,7 @@
 #include <boost/test/unit_test.hpp>
 #include <boost/test/data/test_case.hpp>
 
-#include "sequenceNetwork.h"
+#include "../../src/Modules/TelomereAnalysis/sequenceNetwork.h"
 
 BOOST_AUTO_TEST_SUITE(sequenceNetworkTest)
 

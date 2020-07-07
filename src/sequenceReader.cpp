@@ -78,13 +78,16 @@ cmri::sequenceReader::sequenceReader(std::string input_file, int _quality_value,
 
 bool cmri::sequenceReader::getFastxItem(read_item_t &item) {
 
+    item.clear();
     int l;
     if ((l = kseq_read(kseq)) >= 0) {
         item.sequence = kseq->seq.s;
         double mean_qv = 0;
         if (kseq->qual.l > 0) {
             for (int i = 0; i < kseq->qual.l; i++) {
-                mean_qv += static_cast<int>(kseq->qual.s[i]) - 33;
+                int qv= static_cast<int>(kseq->qual.s[i]) - 33;
+                item.qvalue.push_back(qv);
+                mean_qv += qv;
             }
             mean_qv /= kseq->qual.l;
         }
@@ -125,6 +128,7 @@ void cmri::sequenceReader::closeCsvFile() {
 
 bool cmri::sequenceReader::getBamItem(read_item_t &item) {
 
+    item.clear();
     if (sam_read1(bam_file, bam_header, alignment) > 0) {
         int chromosome_id = alignment->core.tid;
 
@@ -133,11 +137,6 @@ bool cmri::sequenceReader::getBamItem(read_item_t &item) {
 //            || (alignment->core.flag & BAM_FQCFAIL)
             || (alignment->core.flag & BAM_FSUPPLEMENTARY)
                 ) {
-            item.sequence = "";
-            item.start = 0;
-            item.name = "";
-            item.end = 0;
-            item.valid= false;
 #ifdef DEBUG
             LOGGER.debug << "BAM_FSECONDARY,  BAM_FDUP, BAM_FQCFAIL, BAM_FSUPPLEMENTARY" << std::endl;
 #endif
@@ -157,7 +156,9 @@ bool cmri::sequenceReader::getBamItem(read_item_t &item) {
         double mean_qv = 0;
         for (int i = 0; i < len; i++) {
             sequence += seq_nt16_str[bam_seqi(quality, i)]; //gets nucleotide id and converts them into IUPAC id.
-            mean_qv += static_cast<int>(quality[i]);
+            int qv = static_cast<int>(quality[i]);
+            item.qvalue.push_back(qv);
+            mean_qv += qv;
         }
         mean_qv /= len;
         uint32_t mapping_quality = alignment->core.qual;
@@ -176,12 +177,10 @@ bool cmri::sequenceReader::getBamItem(read_item_t &item) {
         item.name = chromosome;
         item.start= start;
         item.valid= true;
-
         count++;
         return true;
     }
 
-    item.valid= false;
     return false;
 }
 
@@ -189,4 +188,14 @@ void cmri::sequenceReader::closeBamFile() {
     bam_destroy1(alignment);
     bam_hdr_destroy(bam_header);
     sam_close(bam_file);
+}
+
+
+void cmri::read_item_t::clear() {
+    sequence = "";
+    qvalue.clear();
+    start = 0;
+    name = "";
+    end = 0;
+    valid= false;
 }

@@ -39,10 +39,13 @@ namespace cmri {
     struct read_item_t {
 
         std::string sequence;
+        std::vector<int> qvalue;
         unsigned int start = 0;
         unsigned int end = 0;
         std::string name;
         bool valid = true;
+
+        void clear();
 
     };
 

@@ -1,7 +1,18 @@
 # GEAR, Genomic sEquence AnalyzeR.
 
-Finds motif sequences using regular expressions in fasta, fastq, csv, or bam files. 
-For bam files it is possible to search motifs in mapped regions. 
+GEAR (Genomic sEquence AnalyzeR) is CMRI's high performance multipurpose software. It is a C++/CUDA software designed for whole genome data analysis. GEAR works with second and third generation sequencing data. 
+
+It is developed following best practices including: documentation, unit tests, code reviews, multi-threading  and multi-platform development. 
+
+Currently there are three modules: 
+
+MotifCount: finds and count DNA motifs and regular expressions in fasta, fastq and bam files. For aligned bam files it is possible to define regions of interest in the genome. 
+
+VariantCallAnalysis: creates a summary analysis from vcf files. The analysis can be performed on regions of interest as well. 
+
+TelomereAnalysis: uses a novel DNA sequence network approach to evaluate telomere variants in long sequence reads. 
+
+
 
 ## Getting Started
 

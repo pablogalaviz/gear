@@ -4,6 +4,9 @@ find_package(Boost REQUIRED COMPONENTS unit_test_framework iostreams)
 
 include_directories(${Boost_INCLUDE_DIR})
 include_directories("${PROJECT_SOURCE_DIR}/include")
+include_directories("${PROJECT_SOURCE_DIR}/Modules/MotifCount")
+include_directories("${PROJECT_SOURCE_DIR}/Modules/TelomereAnalysis")
+include_directories("${PROJECT_SOURCE_DIR}/Modules/VariantCallAnalysis")
 
 #HSTlib SETUP
 message(STATUS "Manually setting htslib up.")
@@ -32,5 +35,5 @@ configure_file(${PROJECT_SOURCE_DIR}/test/data/output/bam_result.json ${CMAKE_CU
 
 
 # Note: a target should be already defined using 'add_executable' or 'add_library'
-add_executable(Boost_Tests_run src/testMotifCount.cpp src/testUtils.cpp src/testSequenceReader.cpp  ${PROJECT_SOURCE_DIR}/src/sequenceReader.cpp ../src/sequenceNetwork.cpp ../include/sequenceNetwork.h ../src/kmerNode.cpp ../include/kmerNode.h src/testKmerNode.cpp src/testSequenceNetwork.cpp)
+add_executable(Boost_Tests_run src/testMotifCount.cpp src/testUtils.cpp src/testSequenceReader.cpp  ${PROJECT_SOURCE_DIR}/src/sequenceReader.cpp ../src/Modules/TelomereAnalysis/sequenceNetwork.cpp ../src/Modules/TelomereAnalysis/sequenceNetwork.h ../src/Modules/TelomereAnalysis/kmerNode.cpp ../src/Modules/TelomereAnalysis/kmerNode.h src/testKmerNode.cpp src/testSequenceNetwork.cpp src/testGenomeRegion.cpp  ${PROJECT_SOURCE_DIR}/src/Modules/MotifCount/motifCount.cpp ${PROJECT_SOURCE_DIR}/src/Modules/MotifCount/motifRegion.cpp ../src/Modules/VariantCallAnalysis/variantRegion.cpp ../src/Modules/VariantCallAnalysis/variantRegion.h src/testVariantRegion.cpp src/testMotifRegion.cpp)
 target_link_libraries(Boost_Tests_run ${Boost_LIBRARIES} ZLIB::ZLIB ${HTSLIB_LIBRARY} ${CMAKE_THREAD_LIBS_INIT})
