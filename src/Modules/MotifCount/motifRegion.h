@@ -44,7 +44,7 @@ namespace cmri{
         std::map<std::string,unsigned int> regex;
 
         std::string serialize() const override;
-         void deserialize(const boost::property_tree::ptree &tree);
+         void deserialize(const boost::property_tree::ptree &tree) override;
 
         inline void resetCount(){
             for(auto &m : motifs){m.second=0;}

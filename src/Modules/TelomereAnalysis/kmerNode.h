@@ -29,6 +29,7 @@
 #include <memory>
 #include <vector>
 #include <map>
+#include <string>
 
 namespace cmri {
 

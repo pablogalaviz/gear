@@ -42,7 +42,7 @@ namespace cmri{
 
 
         std::string serialize() const override;
-        void deserialize(const boost::property_tree::ptree &tree);
+        void deserialize(const boost::property_tree::ptree &tree) override;
 
         inline void resetCount(){
             total_bases=0;

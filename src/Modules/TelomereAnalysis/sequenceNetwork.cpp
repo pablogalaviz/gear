@@ -24,6 +24,7 @@
 
 #include <algorithm>
 #include <logger.h>
+#include <sstream>
 #include "sequenceNetwork.h"
 
 
