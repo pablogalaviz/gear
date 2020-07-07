@@ -35,7 +35,7 @@
 #include "logger.h"
 #include <stdlib.h>
 #include <sam.h>
-
+#include <vector>
 
 namespace cmri {
 
