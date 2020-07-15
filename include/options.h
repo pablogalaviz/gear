@@ -46,9 +46,13 @@ namespace cmri {
 
     struct variant_call_analysis_options_t {
         std::string regions;
+        std::string reference;
 
         void validate() const {
             cmri::open_file(regions,"expecting region description file.").close();
+            cmri::open_file(reference,"expecting reference file.").close();
+            cmri::open_file(reference+".fai","expecting reference index file.").close();
+
         }
     };
 

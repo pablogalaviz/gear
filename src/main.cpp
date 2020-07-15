@@ -76,6 +76,7 @@ int main(const int ac, char *av[]) {
         boost::program_options::options_description variantCallAnalysisOptions("Variant Call Analysis Options:");
         variantCallAnalysisOptions.add_options()
                 ("variant_call_analysis.regions", boost::program_options::value<std::string>(&variant_call_analysis.regions), "Motif per region definition in json format")
+                ("variant_call_analysis.reference", boost::program_options::value<std::string>(&variant_call_analysis.reference), "Fasta reference (required index).")
                 ;
 
         boost::program_options::positional_options_description positional;

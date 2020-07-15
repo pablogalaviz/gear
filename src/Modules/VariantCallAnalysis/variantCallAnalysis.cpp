@@ -3,9 +3,12 @@
 //
 
 #include "../MotifCount/motifRegion.h"
+#include "faidx.h"
 #include "variantCallAnalysis.h"
 #include "vcf.h"
 #include "variantRegion.h"
+#include <zlib.h>
+#include "kseq.h"
 
 void cmri::mainVariantCallAnalysis(common_options_t common_options, variant_call_analysis_options_t variant_call_analysis_options){
 
@@ -24,6 +27,10 @@ void cmri::mainVariantCallAnalysis(common_options_t common_options, variant_call
         exit (EINVAL);
     }
 
+    std::string fai_file_name = variant_call_analysis_options.reference+".fai";
+    auto ref_file_index = fai_load(fai_file_name.c_str());
+    gzFile ref_file = gzopen(variant_call_analysis_options.reference.c_str(), "r");
+    //kseq_t *kseq = kseq_init(file);
 
     htsFile *vcf_file = vcf_open(common_options.input_file.c_str(), "r");
     bcf_hdr_t *vcf_header = vcf_hdr_read(vcf_file);
