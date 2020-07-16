@@ -33,6 +33,7 @@
 #include <boost/iostreams/filtering_streambuf.hpp>
 #include <chrono>
 #include "logger.h"
+#include <map>
 #include <stdlib.h>
 #include <sam.h>
 #include <vector>
@@ -43,6 +44,35 @@ namespace cmri {
     enum format_t : int {
         UNKNOWN = 0b0000'0000, FASTA = 0b0000'0001, CSV = 0b0000'0010, FASTQ = 0b0000'0100, BAM = 0b0000'1000, GZIP = 0b0001'0000 , FILE_TYPE = 0b0000'1111, FASTA_GZ = 0b0001'0001, CSV_GZ = 0b0001'0010, FASTQ_GZ = 0b0001'0100
     };
+
+
+    static std::map<char,char> reverse_map = {
+            {'A','T'}
+            ,{'T','A'}
+            ,{'C','G'}
+            ,{'G','C'}
+            ,{'N','N'}
+            ,{'a','t'}
+            ,{'t','a'}
+            ,{'c','g'}
+            ,{'g','c'}
+            ,{'M','K'}
+            ,{'K','M'}
+            ,{'R','Y'}
+            ,{'Y','R'}
+            ,{'W','W'}
+            ,{'S','S'}
+            ,{'V','B'}
+            ,{'B','V'}
+            ,{'H','D'}
+            ,{'D','H'}
+    };
+
+    inline std:: string reverse_complement(const std::string &sequence){
+        std::string result;
+        for(int i=sequence.size()-1; i >=0; --i){result += reverse_map[sequence[i]];}
+        return result;
+    }
 
     inline format_t file_format(std::string name) {
 
