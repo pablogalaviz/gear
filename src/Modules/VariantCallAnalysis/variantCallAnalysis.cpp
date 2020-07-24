@@ -3,19 +3,52 @@
 //
 
 #include "../MotifCount/motifRegion.h"
-#include "faidx.h"
 #include "variantCallAnalysis.h"
-#include "vcf.h"
 #include "variantRegion.h"
-#include <zlib.h>
 #include <sequenceReader.h>
 #include "kseq.h"
 
-std::string get_snp_key() {
-    std::string result;
 
+std::string
+cmri::get_context(bcf1_t *vcf_record, faidx_t *ref_file_index, std::string chromosome, bool reverse, int left_padding,
+                  int right_padding) {
 
+    int len;
+    std::stringstream region;
+    int pos = vcf_record->pos + 1;
+    region << chromosome << ":" << pos - left_padding << "-" << pos + right_padding;
+    std::string result = fai_fetch(ref_file_index, region.str().c_str(), &len);
+    if (reverse) {
+        result = reverse_complement(result);
+    } else {
+        for (auto &c: result) { c = toupper(c); }
+    }
     return result;
+}
+
+bool cmri::is_reverse(const std::string &allele, const int &variant_type, int index, bool reverse) {
+    if (variant_type == VCF_SNP && index == 0) { return allele == "G" || allele == "A"; }
+    if (variant_type == VCF_MNP && index == 0) {
+        return allele == "GT"
+               || allele == "GG"
+               || allele == "AG"
+               || allele == "GA"
+               || allele == "CA"
+               || allele == "AA";
+    }
+    if (variant_type == VCF_INDEL) {
+        if (allele.size() > 1)//deletion
+        {
+            return allele[1] == 'G' || allele[1] == 'A';
+        }
+        if (allele.size() > 1 && index == 1)//insertion
+        {
+            return allele[0] == 'G' || allele[0] == 'A';
+        }
+    }
+
+    return reverse;
+
 }
 
 
@@ -73,97 +106,162 @@ void cmri::mainVariantCallAnalysis(common_options_t common_options,
     int count = 0;
     while (bcf_read(vcf_file, vcf_header, vcf_record) == 0) {
 
-        if (bcf_get_variant_types(vcf_record) != VCF_SNP && bcf_get_variant_types(vcf_record) != VCF_MNP) { continue; }
+        int variant_type = bcf_get_variant_types(vcf_record);
+        if (variant_type != VCF_SNP && variant_type != VCF_MNP && variant_type != VCF_INDEL) { continue; }
 
         std::string chromosome = bcf_hdr_id2name(vcf_header, vcf_record->rid);
-        if (regions.find(chromosome) == regions.end()) { continue; }
+        if (regions.find(chromosome) == regions.end()) {
+            LOGGER.warning << "regions.find(chromosome) == regions.end()" << std::endl;
+            continue; }
 
         for (auto &item : regions[chromosome]) {
 
             if (!item.intersect(vcf_record->pos)) { continue; }
 
+            std::string filter_str;
+            auto filter = bcf_has_filter(vcf_header, vcf_record, "PASS");
+            if (filter == 1) { filter_str = "PASS"; }
+            else {
+                if (filter == 0) { filter_str = "FAIL"; }
+                else { filter_str = "NP"; }
+            }
+
+
             bcf_unpack(vcf_record, BCF_UN_ALL);
 
-            if (bcf_get_variant_types(vcf_record) == VCF_MNP) {
-                cmri::LOGGER.debug << "variant type: " << type_map[bcf_get_variant_types(vcf_record)] << std::endl;
-            }
-            /*
-            LOGGER.debug << "cvf_record allele ";
-            for (int i = 0; i < vcf_record->d.m_allele; i++) {
-                LOGGER.debug << vcf_record->d.allele[i] << " ";
-            }
-            LOGGER.debug << std::endl;
-*/
             int32_t *gt_arr = NULL, ngt_arr = 0;
             int number_of_genotypes = bcf_get_genotypes(vcf_header, vcf_record, &gt_arr, &ngt_arr);
             if (number_of_genotypes <= 0) {
                 free(gt_arr);
+                LOGGER.warning << "number_of_genotypes <= 0"<<std::endl;
                 continue;
             } // GT not present
-
 
             int max_ploidy = number_of_genotypes / number_of_samples;
             for (int i = 0; i < number_of_samples; i++) {
                 int32_t *ptr = gt_arr + i * max_ploidy;
-                std::stringstream key_stream;
                 bool reverse = false;
+                std::vector<std::string> alleles;
                 for (int j = 0; j < max_ploidy; j++) {
                     // if true, the sample has smaller ploidy
-                    if (ptr[j] == bcf_int32_vector_end) break;
+                    if (ptr[j] == bcf_int32_vector_end) { break; }
 
                     // missing allele
-                    if (bcf_gt_is_missing(ptr[j])) continue;
+                    if (bcf_gt_is_missing(ptr[j])) { LOGGER.warning << "bcf_gt_is_missing(ptr[j])"<<std::endl; continue; }
 
                     // the VCF 0-based allele index
                     int allele_index = bcf_gt_allele(ptr[j]);
 
-                    // is phased?
-                    int is_phased = bcf_gt_is_phased(ptr[j]);
-
                     std::string allele = vcf_record->d.allele[allele_index];
-                    if (j == 0 && (
-                            allele == "G"
-                            || allele == "A"
-                            || allele == "GT"
-                            || allele == "GG"
-                            || allele == "AG"
-                            || allele == "GA"
-                            || allele == "CA"
-                            || allele == "AA"
-                    )) {
-                        reverse = true;
-                    }
+
+                    reverse = is_reverse(allele, variant_type, j, reverse);
+
+                    alleles.push_back(allele);
+                }
+
+                if (alleles.size() < 2) { LOGGER.warning << "alleles.size() < 2"<<std::endl; continue; }
+
+                std::stringstream key_stream;
+                for (int j = 0; j < alleles.size(); j++) {
                     if (reverse) {
-                        allele = reverse_complement(allele);
+                        alleles[j] = reverse_complement(alleles[j]);
                     }
-
-                    key_stream << allele << (j < max_ploidy - 1 ? ">" : "");
+                    key_stream << alleles[j] << (j < max_ploidy - 1 ? ">" : "");
                 }
 
-                int len;
-                std::stringstream region;
-                int pos = vcf_record->pos + 1;
-                region << chromosome << ":" << pos - 1 << "-" << pos + 1;
-                std::string seq = fai_fetch(ref_file_index, region.str().c_str(), &len);
-                if (reverse) {
-                    LOGGER.debug << "to reverse seq " << seq << std::endl;
-                    seq = reverse_complement(seq);
+
+                if (variant_type == VCF_SNP || variant_type == VCF_MNP) {
+                    std::string context = variant_type == VCF_SNP ? "_" +
+                                                                    get_context(vcf_record, ref_file_index, chromosome,
+                                                                                reverse, 1, 1) : "";
+                    std::string mutation_key = key_stream.str() + context + ":" + filter_str;
+
+                    if (item.mutations.find(mutation_key) == item.mutations.end()) { continue; }
+
+                    item.mutations[mutation_key][vcf_header->samples[i]] += 1;
+
+                } else {
+
+                    bool insertion = alleles[0].size() < alleles[1].size();
+                    std::string ID_type = insertion ? "INS" : "DEL";
+
+                    for (int repeats = 1; repeats < 6; repeats++) {
+                        if ((insertion && alleles[1].size() == repeats + 1) ||
+                            (!insertion && alleles[0].size() == repeats + 1)) {
+                            std::string bp = insertion ? alleles[1].substr(1, repeats + 1) : alleles[0].substr(1,
+                                                                                                               repeats +
+                                                                                                               1);
+                            std::vector<std::string> mutation_keys;
+                            std::string context = get_context(vcf_record, ref_file_index, chromosome, reverse,
+                                                              -alleles[0].size(), repeats * 20);
+
+                            std::string repeat_key;
+                            if (repeats == 1) { repeat_key = "_" + bp + "_" + std::to_string(repeats) + "_"; }
+                            else {
+                                if (repeats < 5) { repeat_key = "_repeats_" + std::to_string(repeats) + "_"; }
+                                else { repeat_key = "_repeats_5+_"; }
+                            }
+                            int k = 0;
+                            for (int j = 0; j < context.size(); j += repeats) {
+                                std::string count_key = k < 5 ? std::to_string(k++) : "5+";
+                                std::string new_key =
+                                        ID_type + repeat_key + count_key +
+                                        ":" + filter_str;
+                                std::string context_bp = context.substr(j, repeats);
+                                if (context_bp != bp) {
+                                    mutation_keys.push_back(new_key);
+                                    break;
+                                }
+                            }
+
+                            for (auto mutation_key : mutation_keys) {
+                                if (item.mutations.find(mutation_key) == item.mutations.end()) { continue; }
+                                item.mutations[mutation_key][vcf_header->samples[i]] += 1;
+                            }
+
+                            int pos = vcf_record->pos + 1;
+                            LOGGER.debug << chromosome << ":" << pos << (reverse ? " reverse" : "") << std::endl;
+                            LOGGER.debug << key_stream.str() << std::endl;
+                            LOGGER.debug << context << std::endl;
+
+                            //micro-homologies
+                            if (repeats > 1 && !insertion) {
+                                for (int size = 1; size < repeats; size++) {
+
+                                    std::string left_context = get_context(vcf_record, ref_file_index, chromosome,
+                                                                           reverse,
+                                                                           repeats - size-1, 0);
+                                    std::string right_context = get_context(vcf_record, ref_file_index, chromosome,
+                                                                            reverse,
+                                                                            -repeats - 1, 2 * repeats - size);
+
+                                    std::string mutation_str;
+
+                                    if (left_context == bp.substr(size, repeats - size) ||
+                                        right_context == bp.substr(0, repeats - size)) {
+
+                                        std::string mutation_key = "DEL_MH_"+(repeats <5?std::to_string(repeats):"5+")+"_"+(repeats-size <5?std::to_string(repeats-size):"5+")+":"+filter_str;
+                                        LOGGER.debug << mutation_key << std::endl;
+                                        LOGGER.debug << left_context << "." << bp << "." << right_context << std::endl;
+                                        LOGGER.debug << bp.substr(size, repeats - size) <<" - " << bp.substr(0, repeats - size) << std::endl;
+
+                                        if (item.mutations.find(mutation_key) != item.mutations.end()) {
+                                            item.mutations[mutation_key][vcf_header->samples[i]] += 1;
+                                            break;
+                                        }
+                                    }
+                                }
+
+                            }
+
+                            continue;
+                        }
+
+
+                    }
                 }
 
-                LOGGER.debug << "region " << region.str() << std::endl;
-                LOGGER.debug << "len " << len << std::endl;
-                LOGGER.debug << "mutation key " << key_stream.str() << std::endl;
-                LOGGER.debug << "subtype " << seq << std::endl;
 
-                std::string mutation_key =
-                        bcf_get_variant_types(vcf_record) == VCF_SNP ? key_stream.str()+"_"+ seq
-                                                                     : key_stream.str();
-
-                if (item.mutations.find(mutation_key) == item.mutations.end()) { continue; }
-                item.mutations[mutation_key][vcf_header->samples[i]] += 1;
-                if(bcf_get_variant_types(vcf_record) == VCF_MNP ) {
-                    cmri::LOGGER.debug << vcf_header->samples[i] << " " << key_stream.str() << std::endl;
-                }
             }
 
             item.total_bases++;
