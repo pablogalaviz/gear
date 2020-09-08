@@ -1,7 +1,7 @@
 [common]
-#input_file=/media/pablo/Samsung_2TB/Novogene/hg38/Mutect2_PON_FMC/A1L1.vcf.gz
+input_file=/media/pablo/Samsung_2TB/CMRI/Telomere/RO_Analysis/data/Mutect2/A3L1.vcf.gz
 #input_file=/media/pablo/Samsung_2TB/Novogene/hg38/Mutect2/somatic_full.vcf.gz
-input_file=/media/pablo/Samsung_2TB/Novogene/hg38/BAMs/A1L1_output_ApplyBQSR.bam
+#input_file=/media/pablo/Samsung_2TB/Novogene/hg38/BAMs/A1L1_output_ApplyBQSR.bam
 output_path=/media/pablo/Samsung_2TB/Novogene/hg38/gear_test
 
 threads=10
@@ -9,6 +9,8 @@ chunk_size=1000000
 
 [variant_call_analysis]
 regions=data/par/vc_regions.json
+reference=/media/pablo/Samsung_2TB/Novogene/hg38/hg38.fa
+
 [motif_count]
 motifs=data/par/motifs_telomere.json
 #motifs=data/par/motifs_hg38.json

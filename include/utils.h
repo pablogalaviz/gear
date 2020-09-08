@@ -68,11 +68,20 @@ namespace cmri {
             ,{'D','H'}
     };
 
-    inline std:: string reverse_complement(const std::string &sequence){
+    inline std::string reverse_complement(std::string sequence){
         std::string result;
+        for (auto &c: sequence) { c = toupper(c); }
         for(int i=sequence.size()-1; i >=0; --i){result += reverse_map[sequence[i]];}
         return result;
     }
+
+    inline std:: string reverse_sequence(std::string sequence){
+        std::string result;
+        for (auto &c: sequence) { c = toupper(c); }
+        for(int i=0; i < sequence.size(); i++){result += reverse_map[sequence[i]];}
+        return result;
+    }
+
 
     inline format_t file_format(std::string name) {
 

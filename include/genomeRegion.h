@@ -38,7 +38,7 @@ namespace cmri {
         std::string name;
 
         inline bool intersect(const unsigned int location) const {
-            return start <= location && location <= end;
+            return (start <= location && location <= end) || start==end;
         }
 
 

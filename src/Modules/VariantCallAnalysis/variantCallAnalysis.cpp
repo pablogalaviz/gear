@@ -7,22 +7,18 @@
 #include "variantRegion.h"
 #include <sequenceReader.h>
 #include "kseq.h"
+#include "variantCallRecord.h"
 
 
 std::string
-cmri::get_context(bcf1_t *vcf_record, faidx_t *ref_file_index, std::string chromosome, bool reverse, int left_padding,
+cmri::get_context(faidx_t *ref_file_index, std::string chromosome, int position, int size, int left_padding,
                   int right_padding) {
-
     int len;
-    std::stringstream region;
-    int pos = vcf_record->pos + 1;
-    region << chromosome << ":" << pos - left_padding << "-" << pos + right_padding;
-    std::string result = fai_fetch(ref_file_index, region.str().c_str(), &len);
-    if (reverse) {
-        result = reverse_complement(result);
-    } else {
-        for (auto &c: result) { c = toupper(c); }
-    }
+    std::string region = chromosome + ":"
+                         + std::to_string(position - left_padding + 1) + "-"
+                         + std::to_string(position + size + right_padding);
+    std::string result = fai_fetch(ref_file_index, region.c_str(), &len);
+    for (auto &c: result) { c = toupper(c); }
     return result;
 }
 
@@ -49,6 +45,182 @@ bool cmri::is_reverse(const std::string &allele, const int &variant_type, int in
 
     return reverse;
 
+}
+
+bool cmri::is_reverse(const std::string &allele, const int &variant_type) {
+    if (variant_type == VCF_SNP) { return allele == "G" || allele == "A"; }
+    if (variant_type == VCF_MNP) {
+        return allele == "GT"
+               || allele == "GG"
+               || allele == "AG"
+               || allele == "GA"
+               || allele == "CA"
+               || allele == "AA";
+    }
+    return false;
+}
+
+std::string cmri::get_key_from_snp(faidx_t *ref_file_index, std::string reference, std::string alternate,
+                                   variantCallRecord variant_call_record) {
+
+    std::string result;
+    std::string context = get_context(ref_file_index, variant_call_record.getChromosome(),
+                                      variant_call_record.getPosition(), 1, 1, 1);
+
+    bool reverse = reference == "G" || reference == "A";
+    if (reverse) {
+        result = reverse_complement(reference) + ">" + reverse_complement(alternate);
+        result += "_" + reverse_complement(context);
+    } else {
+        result = reference + ">" + alternate;
+        result += "_" + context;
+    }
+    result += ":" + variant_call_record.getFilter();
+
+    return result;
+
+}
+
+std::string cmri::get_key_from_mnp(std::string reference, std::string alternate,
+                                   variantCallRecord variant_call_record) {
+
+    std::string result;
+
+    bool reverse = reference == "G" || reference == "A";
+    if (reverse) {
+        result = reverse_complement(reference) + ">" + reverse_complement(alternate);
+    } else {
+        result = reference + ">" + alternate;
+    }
+    result += ":" + variant_call_record.getFilter();
+    return result;
+}
+
+
+std::string cmri::get_key_from_insertion(faidx_t *ref_file_index, std::string reference, std::string alternate,
+                                         variantCallRecord variant_call_record) {
+
+    std::string result;
+    int ins_size = alternate.size() - reference.size();
+
+    for (int repeats = 1; repeats < 6; repeats++) {
+        if (ins_size == repeats) {
+            std::string bp = alternate.substr(reference.size(), ins_size);
+            bool reverse = (bp[0] == 'G' || bp[0] == 'A') && repeats == 1;
+
+            std::string left_context = get_context(ref_file_index, variant_call_record.getChromosome(),
+                                                   variant_call_record.getPosition(), reference.size(),
+                                                   repeats * 6, 0);
+            std::string right_context = get_context(ref_file_index, variant_call_record.getChromosome(),
+                                                    variant_call_record.getPosition() + reference.size(), 0,
+                                                    0, repeats * 6);
+            if (reverse) {
+                bp = reverse_complement(bp);
+                left_context = reverse_sequence(left_context);
+                right_context = reverse_sequence(right_context);
+            }
+
+            int matches = 0;
+            for (int i = left_context.size() - repeats; i > 0; i -= repeats) {
+                if (bp != left_context.substr(i, repeats)) { break; }
+                matches++;
+            }
+
+            for (int i = 0; i < right_context.size(); i += repeats) {
+                if (bp != right_context.substr(i, repeats)) { break; }
+                matches++;
+            }
+
+
+            std::string repeats_str = repeats < 5 ? std::to_string(repeats) : "5+";
+            std::string matches_str = matches < 5 ? std::to_string(matches) : "5+";
+
+            result = "INS_" + (repeats == 1 ? bp : "repeats") + "_" + repeats_str + "_" + matches_str + ":" +
+                     variant_call_record.getFilter();
+
+            LOGGER.debug << variant_call_record.getChromosome() << ":"
+                         << variant_call_record.getPosition() << std::endl;
+            LOGGER.debug << left_context << "." << bp << "." << right_context << std::endl;
+            LOGGER.debug << "result: " << result << std::endl;
+
+            break;
+        }
+    }
+
+    return result;
+}
+
+std::string cmri::get_key_from_deletion(faidx_t *ref_file_index, std::string reference, std::string alternate,
+                                        variantCallRecord variant_call_record) {
+
+    std::string result;
+    int deletion_size = reference.size() - alternate.size();
+
+
+    std::string bp = reference.substr(alternate.size(), deletion_size);
+    bool reverse = (bp[0] == 'G' || bp[0] == 'A') && deletion_size == 1;
+
+    std::string left_context = get_context(ref_file_index, variant_call_record.getChromosome(),
+                                           variant_call_record.getPosition(), alternate.size(),
+                                           deletion_size * 6, 0);
+    std::string right_context = get_context(ref_file_index, variant_call_record.getChromosome(),
+                                            variant_call_record.getPosition() + reference.size(), 0,
+                                            0, deletion_size * 6);
+
+
+    if (reverse) {
+        bp = reverse_complement(bp);
+        left_context = reverse_sequence(left_context);
+        right_context = reverse_sequence(right_context);
+    }
+
+    int matches = 0;
+    for (int repeat_size = 0; repeat_size < right_context.size(); repeat_size += deletion_size) {
+        if (bp != right_context.substr(repeat_size, deletion_size)) { break; }
+        matches++;
+    }
+
+    for (int repeat_size = left_context.size() - deletion_size; repeat_size > 0; repeat_size -= deletion_size) {
+        if (bp != left_context.substr(repeat_size, deletion_size)) { break; }
+        matches++;
+    }
+
+    int homology = 0;
+    if (deletion_size > 1 && matches == 0) {
+        int right_homology = 0;
+        for (int homology_size = 1; homology_size < deletion_size ; homology_size++) {
+            if (bp.substr(0, homology_size) != right_context.substr(0, homology_size)) { break; }
+            right_homology = homology_size;
+        }
+        int left_homology = 0;
+        for (int homology_size = 1; homology_size < deletion_size ; homology_size++) {
+            if (bp.substr(bp.size() - homology_size, homology_size) !=
+                left_context.substr(left_context.size() - homology_size, homology_size)) { break; }
+            left_homology = homology_size;
+        }
+        homology = std::max(left_homology, right_homology);
+    }
+
+
+    std::string repeats_str = deletion_size < 5 ? std::to_string(deletion_size) : "5+";
+
+    if (homology > 0) {
+        std::string homology_str = homology < 5 ? std::to_string(homology) : "5+";
+        result = "DEL_MH_" + repeats_str + "_" + homology_str + ":" +
+                 variant_call_record.getFilter();
+    } else {
+        std::string matches_str = matches < 5 ? std::to_string(matches) : "5+";
+        result = "DEL_" + (deletion_size == 1 ? bp : "repeats") + "_" + repeats_str + "_" + matches_str + ":" +
+                 variant_call_record.getFilter();
+    }
+
+    LOGGER.debug << variant_call_record.getChromosome() << ":"
+                 << variant_call_record.getPosition() << std::endl;
+    LOGGER.debug << left_context << "." << bp << "." << right_context << std::endl;
+    LOGGER.debug << "result: " << result << std::endl;
+    LOGGER.debug << std::endl;
+
+    return result;
 }
 
 
@@ -80,7 +252,6 @@ void cmri::mainVariantCallAnalysis(common_options_t common_options,
 
     int number_of_samples = bcf_hdr_nsamples(vcf_header);
 
-
     for (auto &item_vector: regions) {
         for (auto &item : item_vector.second) {
             for (auto &item_mutation : item.mutations) {
@@ -92,195 +263,64 @@ void cmri::mainVariantCallAnalysis(common_options_t common_options,
     }
 
 
-    std::map<int, std::string> type_map{
-            {0,  "VCF_REF"},
-            {1,  "VCF_SNP"},
-            {2,  "VCF_MNP"},
-            {4,  "VCF_INDEL"},
-            {8,  "VCF_OTHER"},
-            {16, "VCF_BND"},
-            {32, "VCF_OVERLAP"}
-    };
-
-
     int count = 0;
     while (bcf_read(vcf_file, vcf_header, vcf_record) == 0) {
 
         int variant_type = bcf_get_variant_types(vcf_record);
         if (variant_type != VCF_SNP && variant_type != VCF_MNP && variant_type != VCF_INDEL) { continue; }
 
-        std::string chromosome = bcf_hdr_id2name(vcf_header, vcf_record->rid);
+        variantCallRecord variant_call_record(vcf_header, vcf_record);
+        if (!variant_call_record.isValid()) { continue; }
+
+        std::string chromosome = variant_call_record.getChromosome();
+
         if (regions.find(chromosome) == regions.end()) {
-            LOGGER.warning << "regions.find(chromosome) == regions.end()" << std::endl;
-            continue; }
-
-        for (auto &item : regions[chromosome]) {
-
-            if (!item.intersect(vcf_record->pos)) { continue; }
-
-            std::string filter_str;
-            auto filter = bcf_has_filter(vcf_header, vcf_record, "PASS");
-            if (filter == 1) { filter_str = "PASS"; }
-            else {
-                if (filter == 0) { filter_str = "FAIL"; }
-                else { filter_str = "NP"; }
-            }
-
-
-            bcf_unpack(vcf_record, BCF_UN_ALL);
-
-            int32_t *gt_arr = NULL, ngt_arr = 0;
-            int number_of_genotypes = bcf_get_genotypes(vcf_header, vcf_record, &gt_arr, &ngt_arr);
-            if (number_of_genotypes <= 0) {
-                free(gt_arr);
-                LOGGER.warning << "number_of_genotypes <= 0"<<std::endl;
-                continue;
-            } // GT not present
-
-            int max_ploidy = number_of_genotypes / number_of_samples;
-            for (int i = 0; i < number_of_samples; i++) {
-                int32_t *ptr = gt_arr + i * max_ploidy;
-                bool reverse = false;
-                std::vector<std::string> alleles;
-                for (int j = 0; j < max_ploidy; j++) {
-                    // if true, the sample has smaller ploidy
-                    if (ptr[j] == bcf_int32_vector_end) { break; }
-
-                    // missing allele
-                    if (bcf_gt_is_missing(ptr[j])) { LOGGER.warning << "bcf_gt_is_missing(ptr[j])"<<std::endl; continue; }
-
-                    // the VCF 0-based allele index
-                    int allele_index = bcf_gt_allele(ptr[j]);
-
-                    std::string allele = vcf_record->d.allele[allele_index];
-
-                    reverse = is_reverse(allele, variant_type, j, reverse);
-
-                    alleles.push_back(allele);
-                }
-
-                if (alleles.size() < 2) { LOGGER.warning << "alleles.size() < 2"<<std::endl; continue; }
-
-                std::stringstream key_stream;
-                for (int j = 0; j < alleles.size(); j++) {
-                    if (reverse) {
-                        alleles[j] = reverse_complement(alleles[j]);
-                    }
-                    key_stream << alleles[j] << (j < max_ploidy - 1 ? ">" : "");
-                }
-
-
-                if (variant_type == VCF_SNP || variant_type == VCF_MNP) {
-                    std::string context = variant_type == VCF_SNP ? "_" +
-                                                                    get_context(vcf_record, ref_file_index, chromosome,
-                                                                                reverse, 1, 1) : "";
-                    std::string mutation_key = key_stream.str() + context + ":" + filter_str;
-
-                    if (item.mutations.find(mutation_key) == item.mutations.end()) { continue; }
-
-                    item.mutations[mutation_key][vcf_header->samples[i]] += 1;
-
-                } else {
-
-                    bool insertion = alleles[0].size() < alleles[1].size();
-                    std::string ID_type = insertion ? "INS" : "DEL";
-
-                    for (int repeats = 1; repeats < 6; repeats++) {
-                        if ((insertion && alleles[1].size() == repeats + 1) ||
-                            (!insertion && alleles[0].size() == repeats + 1)) {
-                            std::string bp = insertion ? alleles[1].substr(1, repeats + 1) : alleles[0].substr(1,
-                                                                                                               repeats +
-                                                                                                               1);
-                            std::vector<std::string> mutation_keys;
-                            std::string context = get_context(vcf_record, ref_file_index, chromosome, reverse,
-                                                              -alleles[0].size(), repeats * 20);
-
-                            std::string repeat_key;
-                            if (repeats == 1) { repeat_key = "_" + bp + "_" + std::to_string(repeats) + "_"; }
-                            else {
-                                if (repeats < 5) { repeat_key = "_repeats_" + std::to_string(repeats) + "_"; }
-                                else { repeat_key = "_repeats_5+_"; }
-                            }
-                            int k = 0;
-                            for (int j = 0; j < context.size(); j += repeats) {
-                                std::string count_key = k < 5 ? std::to_string(k++) : "5+";
-                                std::string new_key =
-                                        ID_type + repeat_key + count_key +
-                                        ":" + filter_str;
-                                std::string context_bp = context.substr(j, repeats);
-                                if (context_bp != bp) {
-                                    mutation_keys.push_back(new_key);
-                                    break;
-                                }
-                            }
-
-                            for (auto mutation_key : mutation_keys) {
-                                if (item.mutations.find(mutation_key) == item.mutations.end()) { continue; }
-                                item.mutations[mutation_key][vcf_header->samples[i]] += 1;
-                            }
-
-                            int pos = vcf_record->pos + 1;
-                            LOGGER.debug << chromosome << ":" << pos << (reverse ? " reverse" : "") << std::endl;
-                            LOGGER.debug << key_stream.str() << std::endl;
-                            LOGGER.debug << context << std::endl;
-
-                            //micro-homologies
-                            if (repeats > 1 && !insertion) {
-                                for (int size = 1; size < repeats; size++) {
-
-                                    std::string left_context = get_context(vcf_record, ref_file_index, chromosome,
-                                                                           reverse,
-                                                                           repeats - size-1, 0);
-                                    std::string right_context = get_context(vcf_record, ref_file_index, chromosome,
-                                                                            reverse,
-                                                                            -repeats - 1, 2 * repeats - size);
-
-                                    std::string mutation_str;
-
-                                    if (left_context == bp.substr(size, repeats - size) ||
-                                        right_context == bp.substr(0, repeats - size)) {
-
-                                        std::string mutation_key = "DEL_MH_"+(repeats <5?std::to_string(repeats):"5+")+"_"+(repeats-size <5?std::to_string(repeats-size):"5+")+":"+filter_str;
-                                        LOGGER.debug << mutation_key << std::endl;
-                                        LOGGER.debug << left_context << "." << bp << "." << right_context << std::endl;
-                                        LOGGER.debug << bp.substr(size, repeats - size) <<" - " << bp.substr(0, repeats - size) << std::endl;
-
-                                        if (item.mutations.find(mutation_key) != item.mutations.end()) {
-                                            item.mutations[mutation_key][vcf_header->samples[i]] += 1;
-                                            break;
-                                        }
-                                    }
-                                }
-
-                            }
-
-                            continue;
-                        }
-
-
-                    }
-                }
-
-
-            }
-
-            item.total_bases++;
-            cmri::LOGGER.debug
-                    << chromosome << " "
-                    << item.start << " "
-                    << vcf_record->pos << " "
-                    << item.end << " "
-                    << item.name << " "
-                    << item.total_bases << " "
-                    << vcf_record->n_sample << " "
-                    << vcf_record->n_allele << " "
-                    << std::endl;
-
+            chromosome="other";
         }
 
-        //if (count > 10) { break; }
-        count++;
+        for (auto &item : regions[chromosome]) {
+            if (!item.intersect(variant_call_record.getPosition())) { continue; }
+
+            for (auto &sample : variant_call_record.getSamples()) {
+                for (auto &alternate : sample.second.variants) {
+                    if (!sample.second.is_variant) { continue; }
+
+                    std::string mutation_key;
+
+                    if (variant_type == VCF_SNP) {
+                        mutation_key = get_key_from_snp(ref_file_index, sample.second.reference, alternate,
+                                                        variant_call_record);
+                    } else {
+                        if (variant_type == VCF_MNP) {
+                            mutation_key = get_key_from_mnp(sample.second.reference, alternate,
+                                                            variant_call_record);
+                        } else {
+                            auto reference = sample.second.reference;
+                            bool insertion = reference.size() < alternate.size();
+
+                            if (insertion) {
+                                mutation_key = get_key_from_insertion(ref_file_index, sample.second.reference,
+                                                                      alternate,
+                                                                      variant_call_record);
+                            } else {
+                                mutation_key = get_key_from_deletion(ref_file_index, sample.second.reference, alternate,
+                                                                     variant_call_record);
+                            }
+
+                        }
+                    }
+
+                    if (item.mutations.find(mutation_key) == item.mutations.end()) { continue; }
+                    item.mutations[mutation_key][sample.first] += 1;
+                    item.total_bases++;
+                    count++;
+                }
+            }
+
+        }
     }
+
+    LOGGER.info << "Total number of mutations " << count << std::endl;
 
     bcf_hdr_destroy(vcf_header);
     vcf_close(vcf_file);

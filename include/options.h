@@ -56,6 +56,16 @@ namespace cmri {
         }
     };
 
+    struct telomere_analysis_options_t {
+        std::string regions;
+
+        void validate() const {
+            cmri::open_file(regions,"expecting region description file.").close();
+        }
+    };
+
+
+
 }
 
 

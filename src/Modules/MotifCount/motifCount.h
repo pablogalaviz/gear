@@ -54,7 +54,7 @@ namespace cmri {
 
     void processMultiThreading(const common_options_t &common_options,const motif_count_options_t &motif_count_options, mapVectorMotifRegion &motif_map);
 
-    void mainMotifCount(common_options_t common_options, motif_count_options_t motif_count_options);
+    void mainMotifCount(const common_options_t &common_options, const motif_count_options_t &motif_count_options);
 
 
 }

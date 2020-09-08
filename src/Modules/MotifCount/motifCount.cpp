@@ -276,7 +276,7 @@ void cmri::processMultiThreading(const common_options_t &common_options,const mo
 
 
 
-void cmri::mainMotifCount(common_options_t common_options, motif_count_options_t motif_count_options){
+void cmri::mainMotifCount(const common_options_t &common_options, const motif_count_options_t &motif_count_options){
 
 
     boost::property_tree::ptree input_tree;

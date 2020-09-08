@@ -29,6 +29,7 @@
 #include "csvParser.h"
 #include "Modules/MotifCount/motifCount.h"
 #include "Modules/VariantCallAnalysis/variantCallAnalysis.h"
+#include "Modules/TelomereAnalysis/telomereAnalysis.h"
 #include "utils.h"
 #include "options.h"
 
@@ -75,18 +76,32 @@ int main(const int ac, char *av[]) {
         cmri::variant_call_analysis_options_t variant_call_analysis;
         boost::program_options::options_description variantCallAnalysisOptions("Variant Call Analysis Options:");
         variantCallAnalysisOptions.add_options()
-                ("variant_call_analysis.regions", boost::program_options::value<std::string>(&variant_call_analysis.regions), "Motif per region definition in json format")
+                ("variant_call_analysis.regions", boost::program_options::value<std::string>(&variant_call_analysis.regions), "Variants per region definition in json format")
                 ("variant_call_analysis.reference", boost::program_options::value<std::string>(&variant_call_analysis.reference), "Fasta reference (required index).")
                 ;
+
+        cmri::telomere_analysis_options_t telomere_analysis;
+        boost::program_options::options_description telomereAnalysisOptions("Telomere Analysis Options:");
+        telomereAnalysisOptions.add_options()
+                ("telomere_analysis.regions", boost::program_options::value<std::string>(&telomere_analysis.regions), "Chromosome region definition in json format")
+                ;
+
 
         boost::program_options::positional_options_description positional;
         positional.add("task", 1);
 
         boost::program_options::options_description cmdlineOptions;
-        cmdlineOptions.add(genericOptions).add(commonOptions).add(motifCountOptions).add(variantCallAnalysisOptions);
+        cmdlineOptions.add(genericOptions)
+        .add(commonOptions)
+        .add(motifCountOptions)
+        .add(variantCallAnalysisOptions)
+        .add(telomereAnalysisOptions);
 
         boost::program_options::options_description configFileOptions;
-        configFileOptions.add(commonOptions).add(motifCountOptions).add(variantCallAnalysisOptions);
+        configFileOptions.add(commonOptions)
+        .add(motifCountOptions)
+        .add(variantCallAnalysisOptions)
+        .add(telomereAnalysisOptions);
 
         boost::program_options::variables_map vm;
         boost::program_options::store(boost::program_options::command_line_parser(ac, av).options(cmdlineOptions).positional(positional).run(),vm);
@@ -136,8 +151,13 @@ int main(const int ac, char *av[]) {
                 variant_call_analysis.validate();
                 cmri::mainVariantCallAnalysis(common, variant_call_analysis);
             }else{
-                cmri::LOGGER.error << "Unknown task: " << task;
-                std::cerr << cmdlineOptions << std::endl;
+                if (task == "TelomereAnalysis") {
+                    telomere_analysis.validate();
+                    cmri::mainTelomereAnalysis(common, telomere_analysis);
+                }else{
+                    cmri::LOGGER.error << "Unknown task: " << task;
+                    std::cerr << cmdlineOptions << std::endl;
+                }
             }
         }
 
