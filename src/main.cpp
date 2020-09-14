@@ -29,9 +29,10 @@
 #include "csvParser.h"
 #include "Modules/MotifCount/motifCount.h"
 #include "Modules/VariantCallAnalysis/variantCallAnalysis.h"
-#include "Modules/TelomereAnalysis/telomereAnalysis.h"
+#include "Modules/GenomeAnalysis/genomeAnalysis.h"
 #include "utils.h"
 #include "options.h"
+#include "Modules/IwgsAnalysis/iwgsAnalysis.h"
 
 
 int main(const int ac, char *av[]) {
@@ -48,7 +49,7 @@ int main(const int ac, char *av[]) {
         genericOptions.add_options()
                 ("debug,d", "Shows debug messages in log")
                 ("help,h", "Shows a help message")
-                ("task", boost::program_options::value<std::string>(&task), "Perform one of the following tasks: [MotifCount, TelomereAnalysis, VariantCallAnalysis]")
+                ("task", boost::program_options::value<std::string>(&task), "Perform one of the following tasks: [MotifCount, GenomeAnalysis, VariantCallAnalysis]")
                 ("parameters,p", boost::program_options::value<std::string>(&parameters), "Parameters file")
                 ("silent,s", "Shows only errors");
 
@@ -80,12 +81,18 @@ int main(const int ac, char *av[]) {
                 ("variant_call_analysis.reference", boost::program_options::value<std::string>(&variant_call_analysis.reference), "Fasta reference (required index).")
                 ;
 
-        cmri::telomere_analysis_options_t telomere_analysis;
-        boost::program_options::options_description telomereAnalysisOptions("Telomere Analysis Options:");
-        telomereAnalysisOptions.add_options()
-                ("telomere_analysis.regions", boost::program_options::value<std::string>(&telomere_analysis.regions), "Chromosome region definition in json format")
+        cmri::genome_analysis_options_t genome_analysis;
+        boost::program_options::options_description genomeAnalysisOptions("Genome Analysis Options:");
+        genomeAnalysisOptions.add_options()
+                ("genome_analysis.regions", boost::program_options::value<std::string>(&genome_analysis.regions), "Chromosome region definition in json format")
                 ;
 
+        cmri::iwgs_analysis_options_t iwgs_analysis;
+        boost::program_options::options_description iwgsAnalysisOptions("Illumina WGS Analysis Options:");
+        genomeAnalysisOptions.add_options()
+                ("iwgs_analysis.pair_ended", boost::program_options::value<bool>(&iwgs_analysis.pair_ended)->default_value(false), "Are the reads pair-ended?")
+                ("iwgs_analysis.input_file", boost::program_options::value<std::string>(&iwgs_analysis.input_file), "Second fastq input file (required if pair-ended)")
+                ;
 
         boost::program_options::positional_options_description positional;
         positional.add("task", 1);
@@ -95,13 +102,17 @@ int main(const int ac, char *av[]) {
         .add(commonOptions)
         .add(motifCountOptions)
         .add(variantCallAnalysisOptions)
-        .add(telomereAnalysisOptions);
+        .add(genomeAnalysisOptions)
+        .add(iwgsAnalysisOptions)
+                ;
 
         boost::program_options::options_description configFileOptions;
         configFileOptions.add(commonOptions)
         .add(motifCountOptions)
         .add(variantCallAnalysisOptions)
-        .add(telomereAnalysisOptions);
+        .add(genomeAnalysisOptions)
+        .add(iwgsAnalysisOptions)
+                ;
 
         boost::program_options::variables_map vm;
         boost::program_options::store(boost::program_options::command_line_parser(ac, av).options(cmdlineOptions).positional(positional).run(),vm);
@@ -151,12 +162,17 @@ int main(const int ac, char *av[]) {
                 variant_call_analysis.validate();
                 cmri::mainVariantCallAnalysis(common, variant_call_analysis);
             }else{
-                if (task == "TelomereAnalysis") {
-                    telomere_analysis.validate();
-                    cmri::mainTelomereAnalysis(common, telomere_analysis);
+                if (task == "GenomeAnalysis") {
+                    genome_analysis.validate();
+                    cmri::mainGenomeAnalysis(common, genome_analysis);
                 }else{
-                    cmri::LOGGER.error << "Unknown task: " << task;
-                    std::cerr << cmdlineOptions << std::endl;
+                    if (task == "IwgsAnalysis") {
+                        iwgs_analysis.validate();
+                        cmri::mainIwgsAnalysis(common, iwgs_analysis);
+                    }else{
+                        cmri::LOGGER.error << "Unknown task: " << task;
+                        std::cerr << cmdlineOptions << std::endl;
+                    }
                 }
             }
         }

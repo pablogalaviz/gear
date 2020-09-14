@@ -11,6 +11,7 @@
 
 namespace cmri {
 
+
     struct common_options_t {
         bool backup;
         std::string output_path;
@@ -56,7 +57,7 @@ namespace cmri {
         }
     };
 
-    struct telomere_analysis_options_t {
+    struct genome_analysis_options_t {
         std::string regions;
 
         void validate() const {
@@ -64,6 +65,20 @@ namespace cmri {
         }
     };
 
+
+    struct iwgs_analysis_options_t {
+        std::string input_file;
+        bool pair_ended;
+
+        void validate() {
+            if(pair_ended) {
+                //test if files exists.
+                cmri::open_file(input_file, "expecting input file").close();
+            }
+        }
+
+
+    };
 
 
 }

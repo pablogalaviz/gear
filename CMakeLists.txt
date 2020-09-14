@@ -13,12 +13,46 @@ set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0")
 
 include_directories("${PROJECT_SOURCE_DIR}/include")
 include_directories("${PROJECT_SOURCE_DIR}/Modules/MotifCount")
-include_directories("${PROJECT_SOURCE_DIR}/Modules/TelomereAnalysis")
+include_directories("${PROJECT_SOURCE_DIR}/Modules/GenomeAnalysis")
 include_directories("${PROJECT_SOURCE_DIR}/Modules/VariantCallAnalysis")
+include_directories("${PROJECT_SOURCE_DIR}/Modules/IwgsAnalysis")
 
 
 #EXEC SETUP
-add_executable(gear src/main.cpp include/kseq.h include/utils.h include/logger.h src/utils.cpp include/csvParser.h src/Modules/MotifCount/motifCount.h src/Modules/MotifCount/motifRegion.h src/sequenceReader.cpp include/sequenceReader.h src/Modules/TelomereAnalysis/sequenceNetwork.cpp src/Modules/TelomereAnalysis/sequenceNetwork.h src/Modules/TelomereAnalysis/kmerNode.cpp src/Modules/TelomereAnalysis/kmerNode.h include/options.h src/Modules/VariantCallAnalysis/variantCallAnalysis.cpp src/Modules/VariantCallAnalysis/variantCallAnalysis.h src/Modules/MotifCount/motifCount.cpp src/Modules/MotifCount/motifRegion.cpp include/genomeRegion.h src/Modules/VariantCallAnalysis/variantRegion.cpp src/Modules/VariantCallAnalysis/variantRegion.h src/Modules/VariantCallAnalysis/variantCallRecord.cpp src/Modules/VariantCallAnalysis/variantCallRecord.h src/Modules/TelomereAnalysis/telomereAnalysis.cpp src/Modules/TelomereAnalysis/telomereAnalysis.h src/Modules/TelomereAnalysis/telomereRegion.cpp src/Modules/TelomereAnalysis/telomereRegion.h src/bedWriter.cpp include/bedWriter.h) #kernels.cuh ${KERNEL_O}
+add_executable(gear
+        src/main.cpp
+        src/utils.cpp
+        src/sequenceReader.cpp
+        src/bedWriter.cpp
+        src/Modules/MotifCount/motifCount.h
+        src/Modules/MotifCount/motifRegion.h
+        src/Modules/GenomeAnalysis/sequenceNetwork.cpp
+        src/Modules/GenomeAnalysis/sequenceNetwork.h
+        src/Modules/GenomeAnalysis/kmerNode.cpp
+        src/Modules/GenomeAnalysis/kmerNode.h
+        src/Modules/VariantCallAnalysis/variantCallAnalysis.cpp
+        src/Modules/VariantCallAnalysis/variantCallAnalysis.h
+        src/Modules/VariantCallAnalysis/variantRegion.cpp
+        src/Modules/VariantCallAnalysis/variantRegion.h
+        src/Modules/VariantCallAnalysis/variantCallRecord.cpp
+        src/Modules/VariantCallAnalysis/variantCallRecord.h
+        src/Modules/MotifCount/motifCount.cpp
+        src/Modules/MotifCount/motifRegion.cpp
+        src/Modules/GenomeAnalysis/genomeAnalysis.cpp
+        src/Modules/GenomeAnalysis/genomeAnalysis.h
+        src/Modules/GenomeAnalysis/telomereRegion.cpp
+        src/Modules/GenomeAnalysis/telomereRegion.h
+        src/Modules/IwgsAnalysis/iwgsAnalysis.cpp
+        src/Modules/IwgsAnalysis/iwgsAnalysis.h
+        include/bedWriter.h
+        include/genomeRegion.h
+        include/options.h
+        include/sequenceReader.h
+        include/csvParser.h
+        include/kseq.h
+        include/utils.h
+        include/logger.h
+        )
 
 #BOOST SETUP
 set(BOOST_ROOT "/opt/boost")

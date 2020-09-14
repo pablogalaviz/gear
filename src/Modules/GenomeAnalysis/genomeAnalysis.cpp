@@ -3,7 +3,7 @@
 #include <boost/property_tree/json_parser.hpp>
 #include <faidx.h>
 #include <bedWriter.h>
-#include "telomereAnalysis.h"
+#include "genomeAnalysis.h"
 #include "telomereRegion.h"
 
 //
@@ -30,8 +30,8 @@
 //
 
 
-void cmri::mainTelomereAnalysis(const common_options_t &common_options,
-                                const telomere_analysis_options_t &telomere_options) {
+void cmri::mainGenomeAnalysis(const common_options_t &common_options,
+                              const genome_analysis_options_t &telomere_options) {
 
     boost::property_tree::ptree region_data;
     boost::property_tree::read_json(telomere_options.regions, region_data);
