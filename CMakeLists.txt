@@ -52,7 +52,7 @@ add_executable(gear
         include/kseq.h
         include/utils.h
         include/logger.h
-        )
+        src/Modules/IwgsAnalysis/sequenceClassification.cpp src/Modules/IwgsAnalysis/sequenceClassification.h)
 
 #BOOST SETUP
 set(BOOST_ROOT "/opt/boost")

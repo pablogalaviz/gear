@@ -178,7 +178,7 @@ namespace cmri {
             sys_out = system(rmdir.c_str());
         }
 
-        std::string mkdir = "mkdir " + path;
+        std::string mkdir = "mkdir -p " + path;
         sys_out = system(mkdir.c_str());
 
     }
