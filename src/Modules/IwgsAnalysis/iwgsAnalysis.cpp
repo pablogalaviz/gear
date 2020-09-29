@@ -1,4 +1,3 @@
-
 //  This file is part of GEAR
 //
 //  GEAR is free software: you can redistribute it and/or modify
@@ -16,24 +15,102 @@
 //
 
 #include "iwgsAnalysis.h"
-#include <faidx.h>
+#include "../MotifCount/motifCount.h"
+#include "sequenceClassification.h"
+#include <zlib.h>
+
 
 void cmri::mainIwgsAnalysis(const common_options_t &common_options,
                               const iwgs_analysis_options_t &iwgs_options) {
 
+        cmri::open_file(common_options.input_file, "expecting index file.").close();
+        gzFile file = gzopen(common_options.input_file.c_str(), "r");
+        kseq_t *kseq = kseq_init(file);
+        int l;
+        int count =0;
 
-    cmri::open_file(common_options.input_file + ".fai", "expecting index file.").close();
 
-    faidx_t *ref_file_index = fai_load(common_options.input_file.c_str());
+        std::vector<std::string> variants;
+        variants.push_back("TCAGGG");
+        variants.push_back("TGAGGG");
 
-    faidx_t *ref_file_index_pair;
+        iwgsAnalysis iwgs("TTAGGG", variants, 5);
 
-    if(iwgs_options.pair_ended) {
-        cmri::open_file(iwgs_options.input_file + ".fai", "expecting index file.").close();
-        ref_file_index_pair = fai_load(iwgs_options.input_file.c_str());
+        while ((l = kseq_read(kseq)) >= 0) {
+
+            if(iwgs.count_filter(kseq->name.s, kseq->seq.s, kseq->qual.s)){
+                break;
+
+            }
+            count++;
+            if(count > 10000){
+            }
+
+        }
+
+        LOGGER.debug << "count: " << count << std::endl;
+
+
+}
+
+
+bool cmri::iwgsAnalysis::count_filter(std::string name, std::string sequence, std::string quality) {
+
+
+    if(searchMotif(sequence, motif_forward) > count_filter_threshold){
+
+        LOGGER.debug << "forward process " << name << std::endl;
+        LOGGER.debug << "seq " << sequence << std::endl;
+
+        return true;
     }
 
 
+
+    if(searchMotif(sequence, motif_reverse)  > count_filter_threshold){
+
+        sequenceClassification sequence_classification(variants_reverse);
+
+        LOGGER.debug << "reverse process " << name << std::endl;
+        LOGGER.debug << "seq " << sequence << std::endl;
+        LOGGER.debug << "quality " << quality << std::endl;
+
+        std::string::size_type previous = 0;
+        std::string::size_type start = 0;
+        while ((start = sequence.find(motif_reverse, start)) != std::string::npos) {
+            // move start to find the rest of the string.
+
+            std::string::size_type segment_size = start-previous;
+            if(segment_size > 0){
+                std::string segment = sequence.substr(previous,segment_size);
+                std::string segment_qv = quality.substr(previous,segment_size);
+                LOGGER.debug << "segment " <<  segment << " " <<previous << ":" << start << std::endl;
+                sequence_classification.append_segment(segment,segment_qv);
+            }
+
+            sequence_classification.append_motif(quality.substr(start,motif_reverse.size()));
+
+            start += motif_reverse.size();
+            previous = start;
+        }
+
+        return true;
+    }
+
+    return false;
+
+}
+
+cmri::iwgsAnalysis::iwgsAnalysis(const std::string &motif, const std::vector<std::string> &variants, int countFilterThreshold) :
+        motif_forward(motif)
+        ,variants_forward(variants)
+        ,count_filter_threshold(countFilterThreshold) {
+
+    motif_reverse = reverse_complement(motif);
+
+    for(auto &variants : variants_forward){
+        variants_reverse.push_back(reverse_complement(variants));
+    }
 
 
 }

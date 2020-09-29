@@ -49,7 +49,7 @@ int main(const int ac, char *av[]) {
         genericOptions.add_options()
                 ("debug,d", "Shows debug messages in log")
                 ("help,h", "Shows a help message")
-                ("task", boost::program_options::value<std::string>(&task), "Perform one of the following tasks: [MotifCount, GenomeAnalysis, VariantCallAnalysis]")
+                ("task", boost::program_options::value<std::string>(&task), "Perform one of the following tasks: [MotifCount, GenomeAnalysis, VariantCallAnalysis, IwgsAnalysis]")
                 ("parameters,p", boost::program_options::value<std::string>(&parameters), "Parameters file")
                 ("silent,s", "Shows only errors");
 
