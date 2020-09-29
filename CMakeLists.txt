@@ -92,3 +92,4 @@ find_package (Threads REQUIRED)
 target_link_libraries(gear ${Boost_LIBRARIES} ${HTSLIB_LIBRARY} ZLIB::ZLIB ${CMAKE_THREAD_LIBS_INIT})
 add_subdirectory(${PROJECT_SOURCE_DIR}/test)
 
+install(TARGETS gear DESTINATION bin CONFIGURATIONS Release)
