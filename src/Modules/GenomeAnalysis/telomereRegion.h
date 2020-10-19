@@ -30,7 +30,7 @@ namespace cmri {
 
             unsigned int total_bases=0;
 
-            std::map<std::string,telomere_signature_t> signature;
+            std::map<std::string,telomere_signature_t> variants;
 
             std::string serialize() const override;
             void deserialize(const boost::property_tree::ptree &tree) override;

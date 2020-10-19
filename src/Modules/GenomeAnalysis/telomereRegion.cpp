@@ -62,7 +62,7 @@ std::string cmri::telomereRegion::serialize() const {
     result << ",\"end\":" << end;
     result << ",\"name\":\"" << name << "\"";
     result << ",\"total_bases\":" << total_bases;
-    result << ",\"variants\":" << cmri::serialize(signature);
+    result << ",\"variants\":" << cmri::serialize(variants);
     result << "}";
     return result.str();
 }
@@ -71,7 +71,7 @@ void cmri::telomereRegion::deserialize(const boost::property_tree::ptree &tree) 
     try {
         genomeRegion::deserialize(tree);
         total_bases = tree.get<unsigned int>("total_bases");
-        cmri::deserialize(tree.get_child("signature"), signature);
+        cmri::deserialize(tree.get_child("variants"), variants);
 /*
         for(auto &item : tree.get_child("signature")){
             std::map<std::string, telomere_signature_t> values;

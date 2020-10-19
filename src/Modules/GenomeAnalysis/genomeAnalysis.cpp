@@ -41,7 +41,7 @@ void cmri::mainGenomeAnalysis(const common_options_t &common_options,
 
     if (regions.empty()) {
         cmri::LOGGER.error << "From: " << __FILE__ << ":" << __LINE__ << std::endl;
-        cmri::LOGGER.error << "Invalid argument. No valid motif list found!" << std::endl;
+        cmri::LOGGER.error << "Invalid argument. No valid region list found!" << std::endl;
         exit(EINVAL);
     }
 
@@ -55,6 +55,9 @@ void cmri::mainGenomeAnalysis(const common_options_t &common_options,
 
     for (auto &chromosome_item : regions) {
         std::string chromosome = chromosome_item.first;
+
+        cmri::LOGGER.info << "Procesing contig: " << chromosome << std::endl;
+
         for (auto &region_item : chromosome_item.second) {
             if (region_item.start == region_item.end) { continue; }
 
@@ -63,10 +66,14 @@ void cmri::mainGenomeAnalysis(const common_options_t &common_options,
                                  + std::to_string(region_item.start) + "-"
                                  + std::to_string(region_item.end);
             std::string sequence = fai_fetch(ref_file_index, region.c_str(), &len);
-            for (auto &c: sequence) { c = toupper(c); }
+            region_item.total_bases = sequence.size();
+
+            if(telomere_options.validate) {
+                for (auto &c: sequence) { c = toupper(c); }
+            }
 
             int variant_index=0;
-            for (auto &variant : region_item.signature) {
+            for (auto &variant : region_item.variants) {
                 variant_index++;
                 std::string::size_type start = 0;
                 start = sequence.find(variant.first, start);
@@ -121,7 +128,6 @@ void cmri::mainGenomeAnalysis(const common_options_t &common_options,
                 variant.second.count=count;
 
             }
-
 
 
 

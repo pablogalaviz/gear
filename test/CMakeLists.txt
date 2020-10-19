@@ -13,11 +13,18 @@ message(STATUS "Manually setting htslib up.")
 if(EXISTS "/usr/include/htslib/")
     message(STATUS "Found htslib: /usr/include/htslib/")
     set(HTSLIB_INCLUDE_DIR "/usr/include/htslib/")
+    set(HTSLIB_LIBRARY "-lhts")
 elseif(EXISTS "/usr/local/include/htslib/")
     message(STATUS "Found htslib: /usr/local/include/htslib/")
     set(HTSLIB_INCLUDE_DIR "/usr/local/include/htslib/")
+    set(HTSLIB_LIBRARY "-lhts")
+elseif(EXISTS "/sw/include/htslib/")
+    message(STATUS "Found htslib: /sw/include/htslib/")
+    set(HTSLIB_INCLUDE_DIR "/sw/include/htslib/")
+    set(HTSLIB_LIBRARY "-L/sw/lib/ -lhts")
 endif()
-set(HTSLIB_LIBRARY "-lhts")
+
+
 include_directories(${HTSLIB_INCLUDE_DIR})
 
 find_package(ZLIB)
@@ -35,5 +42,23 @@ configure_file(${PROJECT_SOURCE_DIR}/test/data/output/bam_result.json ${CMAKE_CU
 
 
 # Note: a target should be already defined using 'add_executable' or 'add_library'
-add_executable(Boost_Tests_run src/testMotifCount.cpp src/testUtils.cpp src/testSequenceReader.cpp  ${PROJECT_SOURCE_DIR}/src/sequenceReader.cpp ../src/Modules/GenomeAnalysis/sequenceNetwork.cpp ../src/Modules/GenomeAnalysis/sequenceNetwork.h ../src/Modules/GenomeAnalysis/kmerNode.cpp ../src/Modules/GenomeAnalysis/kmerNode.h src/testKmerNode.cpp src/testSequenceNetwork.cpp src/testGenomeRegion.cpp  ${PROJECT_SOURCE_DIR}/src/Modules/MotifCount/motifCount.cpp ${PROJECT_SOURCE_DIR}/src/Modules/MotifCount/motifRegion.cpp ../src/Modules/VariantCallAnalysis/variantRegion.cpp ../src/Modules/VariantCallAnalysis/variantRegion.h src/testVariantRegion.cpp src/testMotifRegion.cpp)
+add_executable(Boost_Tests_run
+        src/testMotifCount.cpp
+        src/testUtils.cpp
+        src/testSequenceReader.cpp
+        ${PROJECT_SOURCE_DIR}/src/sequenceReader.cpp
+        ${PROJECT_SOURCE_DIR}/src/Modules/GenomeAnalysis/sequenceNetwork.cpp
+        ${PROJECT_SOURCE_DIR}/src/Modules/GenomeAnalysis/sequenceNetwork.h
+        ${PROJECT_SOURCE_DIR}/src/Modules/GenomeAnalysis/kmerNode.cpp
+        ${PROJECT_SOURCE_DIR}/src/Modules/GenomeAnalysis/kmerNode.h
+        ${PROJECT_SOURCE_DIR}/src/Modules/MotifCount/motifCount.cpp
+        ${PROJECT_SOURCE_DIR}/src/Modules/MotifCount/motifRegion.cpp
+        ${PROJECT_SOURCE_DIR}/src/Modules/VariantCallAnalysis/variantRegion.cpp
+        ${PROJECT_SOURCE_DIR}/src/Modules/VariantCallAnalysis/variantRegion.h
+        src/testKmerNode.cpp
+        src/testSequenceNetwork.cpp
+        src/testGenomeRegion.cpp
+        src/testVariantRegion.cpp
+        src/testMotifRegion.cpp)
+
 target_link_libraries(Boost_Tests_run ${Boost_LIBRARIES} ZLIB::ZLIB ${HTSLIB_LIBRARY} ${CMAKE_THREAD_LIBS_INIT})
