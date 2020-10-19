@@ -56,11 +56,11 @@ add_executable(gear
 
 #BOOST SETUP
 set(BOOST_ROOT "/opt/boost")
-set(Boost_USE_STATIC_LIBS OFF)
+set(Boost_USE_STATIC_LIBS ON)
 set(Boost_USE_MULTITHREADED ON)
-set(Boost_USE_STATIC_RUNTIME OFF)
+set(Boost_USE_STATIC_RUNTIME ON)
 
-find_package(Boost 1.68 COMPONENTS program_options iostreams)
+find_package(Boost COMPONENTS program_options  iostreams  filesystem system REQUIRED)
 
 if(NOT Boost_FOUND)
     message(FATAL_ERROR "Could not find boost!")
@@ -89,7 +89,7 @@ include_directories(${HTSLIB_INCLUDE_DIR})
 find_package(ZLIB REQUIRED)
 find_package (Threads REQUIRED)
 
-target_link_libraries(gear ${Boost_LIBRARIES} ${HTSLIB_LIBRARY} ZLIB::ZLIB ${CMAKE_THREAD_LIBS_INIT})
+target_link_libraries(gear ${Boost_LIBRARIES} ${HTSLIB_LIBRARY} ZLIB::ZLIB ${CMAKE_THREAD_LIBS_INIT} Boost::iostreams  Boost::filesystem Boost::system)
 add_subdirectory(${PROJECT_SOURCE_DIR}/test)
 
-install(TARGETS gear DESTINATION bin CONFIGURATIONS Release)
+install(TARGETS gear DESTINATION $ENV{HOME}/bin CONFIGURATIONS Release)

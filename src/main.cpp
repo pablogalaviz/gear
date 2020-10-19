@@ -90,8 +90,8 @@ int main(const int ac, char *av[]) {
         cmri::iwgs_analysis_options_t iwgs_analysis;
         boost::program_options::options_description iwgsAnalysisOptions("Illumina WGS Analysis Options:");
         genomeAnalysisOptions.add_options()
-                ("iwgs_analysis.pair_ended", boost::program_options::value<bool>(&iwgs_analysis.pair_ended)->default_value(false), "Are the reads pair-ended?")
-                ("iwgs_analysis.input_file", boost::program_options::value<std::string>(&iwgs_analysis.input_file), "Second fastq input file (required if pair-ended)")
+                ("iwgs_analysis.input_file", boost::program_options::value<std::string>(&iwgs_analysis.input_file), "Second fastq input file")
+                ("iwgs_analysis.variants_file", boost::program_options::value<std::string>(&iwgs_analysis.variants_file), "List of variants")
                 ;
 
         boost::program_options::positional_options_description positional;

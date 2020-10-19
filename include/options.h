@@ -68,13 +68,12 @@ namespace cmri {
 
     struct iwgs_analysis_options_t {
         std::string input_file;
-        bool pair_ended;
+        std::string variants_file;
 
         void validate() {
-            if(pair_ended) {
-                //test if files exists.
-                cmri::open_file(input_file, "expecting input file").close();
-            }
+            //test if files exists.
+            cmri::open_file(input_file, "expecting input file").close();
+            cmri::open_file(variants_file, "expecting variants file").close();
         }
 
 
