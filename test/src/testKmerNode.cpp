@@ -2,7 +2,7 @@
 
 #include <boost/test/unit_test.hpp>
 #include <boost/test/data/test_case.hpp>
-#include "../../src/Modules/TelomereAnalysis/kmerNode.h"
+#include "../../src/Modules/GenomeAnalysis/kmerNode.h"
 
 
 BOOST_AUTO_TEST_SUITE(kmerNodeTest)

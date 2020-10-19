@@ -85,11 +85,12 @@ int main(const int ac, char *av[]) {
         boost::program_options::options_description genomeAnalysisOptions("Genome Analysis Options:");
         genomeAnalysisOptions.add_options()
                 ("genome_analysis.regions", boost::program_options::value<std::string>(&genome_analysis.regions), "Chromosome region definition in json format")
+                ("genome_analysis.validate", boost::program_options::value<bool>(&genome_analysis.validate)->default_value(true), "Validate sequence (slow for long contigs)")
                 ;
 
         cmri::iwgs_analysis_options_t iwgs_analysis;
         boost::program_options::options_description iwgsAnalysisOptions("Illumina WGS Analysis Options:");
-        genomeAnalysisOptions.add_options()
+        iwgsAnalysisOptions.add_options()
                 ("iwgs_analysis.pair_ended", boost::program_options::value<bool>(&iwgs_analysis.pair_ended)->default_value(false), "Are the reads pair-ended?")
                 ("iwgs_analysis.input_file", boost::program_options::value<std::string>(&iwgs_analysis.input_file), "Second fastq input file (required if pair-ended)")
                 ;
