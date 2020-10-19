@@ -68,7 +68,7 @@ void cmri::mainGenomeAnalysis(const common_options_t &common_options,
             std::string sequence = fai_fetch(ref_file_index, region.c_str(), &len);
             region_item.total_bases = sequence.size();
 
-            if(telomere_options.validate) {
+            if(telomere_options.validate_sequence) {
                 for (auto &c: sequence) { c = toupper(c); }
             }
 

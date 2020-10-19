@@ -43,6 +43,8 @@ namespace cmri {
 
     //given a DNA sequence string and a regular expression count the number of occurrences of the given regular expression in the string
     unsigned int searchRegex(std::string sequence, const std::string &regex);
+    void searchRegex(std::string sequence, std::vector<int> quality,
+                     std::map<std::string, std::map<unsigned int, unsigned int>> &regex_quality);
 
     //given a DNA sequence string and a regular expression count the number of CONSECUTIVE occurrences of the given regular expression in the string
     int searchRegexConsecutive(std::string sequence, const std::string &regex);

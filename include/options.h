@@ -59,7 +59,7 @@ namespace cmri {
 
     struct genome_analysis_options_t {
         std::string regions;
-        bool validate;
+        bool validate_sequence;
 
         void validate() const {
             cmri::open_file(regions,"expecting region description file.").close();

@@ -32,16 +32,21 @@ std::string cmri::motifRegion::serialize() const {
     result << ",\"name\":\"" << name << "\"";
     result << ",\"count\":" << reads_count;
     result << ",\"total_bases\":" << total_bases;
-    result << ",\"motifs\":" << cmri::serialize(motifs);
 
-    result << ",\"motif_quality\":{";
-    for(auto iter_data = motif_quality.begin(); iter_data != motif_quality.end(); ++iter_data) {
+    result << ",\"motifs\":{";
+    for(auto iter_data = motifs.begin(); iter_data != motifs.end(); ++iter_data) {
         result << "\"" << iter_data->first <<"\" : " << cmri::serialize(iter_data->second);
-        result << (std::next(iter_data) != motif_quality.end() ? "," : "");
+        result << (std::next(iter_data) != motifs.end() ? "," : "");
     }
     result << "}";
 
-    result << ",\"regex\":" << cmri::serialize(regex);
+    result << ",\"regex\":{";
+    for(auto iter_data = regex.begin(); iter_data != regex.end(); ++iter_data) {
+        result << "\"" << iter_data->first <<"\" : " << cmri::serialize(iter_data->second);
+        result << (std::next(iter_data) != regex.end() ? "," : "");
+    }
+    result << "}";
+
     result << "}";
     return result.str();
 }
@@ -51,24 +56,37 @@ void cmri::motifRegion::deserialize(const boost::property_tree::ptree &tree) {
         genomeRegion::deserialize(tree);
         reads_count = tree.get<unsigned int>("count");
         total_bases = tree.get<unsigned int>("total_bases");
-        cmri::deserialize(tree.get_child("motifs"), motifs);
 
-        for(auto &item : tree.get_child("motif_quality")){
+        for(auto &item : tree.get_child("motifs")){
             std::map<unsigned int, unsigned int> values;
             for(auto &child_item : item.second){
                 values[std::stoi(child_item.first)]=child_item.second.get_value<unsigned int>();
             }
-            motif_quality[item.first]=values;
+            motifs[item.first]=values;
         }
         //TODO: try to make use of template
         //cmri::deserialize(tree.get_child("motif_quality"), motif_quality);
-
-        for (auto &mq : motif_quality) {
+        for (auto &mq : motifs) {
             for (int i = 0; i < 100; i++) {
                 mq.second[i] = 0;
             }
         }
-        cmri::deserialize(tree.get_child("regex"), regex);
+
+        for(auto &item : tree.get_child("regex")){
+            std::map<unsigned int, unsigned int> values;
+            for(auto &child_item : item.second){
+                values[std::stoi(child_item.first)]=child_item.second.get_value<unsigned int>();
+            }
+            regex[item.first]=values;
+        }
+        //TODO: try to make use of template
+        //cmri::deserialize(tree.get_child("motif_quality"), motif_quality);
+        for (auto &r : regex) {
+            for (int i = 0; i < 100; i++) {
+                r.second[i] = 0;
+            }
+        }
+
 
     }
     catch (std::exception &e) {

@@ -39,19 +39,15 @@ namespace cmri{
         unsigned int reads_count=0;
         unsigned int total_bases=0;
 
-        std::map<std::string,unsigned int> motifs;
-        std::map<std::string,std::map<unsigned int,unsigned int>> motif_quality;
-        std::map<std::string,unsigned int> regex;
+        std::map<std::string,std::map<unsigned int,unsigned int>> motifs;
+        std::map<std::string,std::map<unsigned int,unsigned int>> regex;
 
         std::string serialize() const override;
          void deserialize(const boost::property_tree::ptree &tree) override;
 
         inline void resetCount(){
-            for(auto &m : motifs){m.second=0;}
-            for(auto &mq : motif_quality){
-                for(auto &m : mq.second){m.second=0;}
-            }
-            for(auto &r : regex){r.second=0;}
+            for(auto &mq : motifs){for(auto &m : mq.second){ m.second=0;}}
+            for(auto &r : regex){for(auto &rr : r.second){rr.second=0;}}
             reads_count=0;
             total_bases=0;
         }
@@ -66,13 +62,16 @@ namespace cmri{
 
         void operator+=(motifRegion &rhs)  {
             if(genomeRegion::operator==(rhs)){
-               for(auto &m : motifs){m.second+=rhs.motifs[m.first];}
-                for(auto &mq : motif_quality){
+                for(auto &mq : motifs){
                     for(auto &m : mq.second){
-                        m.second+=rhs.motif_quality[mq.first][m.first];
+                        m.second+=rhs.motifs[mq.first][m.first];
                     }
                 }
-                for(auto &r : regex){r.second+=rhs.regex[r.first];}
+                for(auto &r : regex){
+                    for(auto &rr : r.second){
+                        rr.second+=rhs.regex[r.first][rr.first];
+                    }
+                }
                 reads_count += rhs.reads_count;
                 total_bases+= rhs.total_bases;
             }

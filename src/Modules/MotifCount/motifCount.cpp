@@ -36,27 +36,24 @@ unsigned int cmri::searchMotif(std::string sequence, const std::string &motif) {
     return occurrences;
 }
 
-void cmri::searchMotifWFilter(std::string sequence, std::vector<int> quality, std::map<std::string,std::map<unsigned int,unsigned int>> &motif_quality){
+void cmri::searchMotifWFilter(std::string sequence, std::vector<int> quality,
+                              std::map<std::string, std::map<unsigned int, unsigned int>> &motif_quality) {
 
-    for(auto & motif : motif_quality){
-        int occurrences = 0;
+    for (auto &motif : motif_quality) {
         std::string::size_type start = 0;
         while ((start = sequence.find(motif.first, start)) != std::string::npos) {
-            ++occurrences;
             int step = motif.first.size();
             int qv_mean = 0;
-            for(int i=start;i < start+step; i++) {
+            for (int i = start; i < start + step; i++) {
                 qv_mean += quality[i];
             }
-            qv_mean= static_cast<int>(std::round(qv_mean/step));
-            if(qv_mean <0 || qv_mean > 99){qv_mean=0;}
+            qv_mean = static_cast<int>(std::round(qv_mean / step));
+            if (qv_mean < 0 || qv_mean > 99) { qv_mean = 0; }
             motif.second[qv_mean]++;
             // move start to find the rest of the string.
             start += step;
         }
-
     }
-
 }
 
 
@@ -73,6 +70,35 @@ unsigned int cmri::searchRegex(std::string sequence, const std::string &regex) {
     }
 
     return occurrences;
+}
+
+
+void cmri::searchRegex(std::string sequence, std::vector<int> quality,
+                       std::map<std::string, std::map<unsigned int, unsigned int>> &regex_quality) {
+
+
+    for (auto &regex : regex_quality) {
+
+        std::regex basic_regex(regex.first);
+        std::smatch match;
+
+        while (std::regex_search(sequence, match, basic_regex)) {
+
+            int step = match.str().size();
+            int qv_mean = 0;
+            std::string::size_type start = match.position();
+            for (int i = start; i < start + step; i++) {
+                qv_mean += quality[i];
+            }
+            qv_mean = static_cast<int>(std::round(qv_mean / step));
+            if (qv_mean < 0 || qv_mean > 99) { qv_mean = 0; }
+            regex.second[qv_mean]++;
+
+            // suffix to find the rest of the string.
+            sequence = match.suffix().str();
+        }
+
+    }
 }
 
 
@@ -95,7 +121,7 @@ int cmri::searchRegexConsecutive(std::string sequence, const std::string &regex)
 
 
 cmri::mapVectorMotifRegion
-cmri::processWorker(mapVectorMotifRegion motif_map, const std::vector<cmri::read_item_t>& sequences, bool validate) {
+cmri::processWorker(mapVectorMotifRegion motif_map, const std::vector<cmri::read_item_t> &sequences, bool validate) {
 
 
     for (auto &item : motif_map) {
@@ -104,7 +130,7 @@ cmri::processWorker(mapVectorMotifRegion motif_map, const std::vector<cmri::read
         }
     }
 
-    for (const auto& seq : sequences) {
+    for (const auto &seq : sequences) {
 
         if (motif_map.find(seq.name) != motif_map.end()) {
             for (auto &item : motif_map[seq.name]) {
@@ -114,15 +140,12 @@ cmri::processWorker(mapVectorMotifRegion motif_map, const std::vector<cmri::read
                 std::string sequence = seq.sequence;
                 if (validate) { for (auto &c: sequence) { c = toupper(c); }}
 
-                for (auto &m : item.motifs) {
-                    m.second += searchMotif(sequence, m.first);
-                }
-                searchMotifWFilter(sequence,seq.qvalue,item.motif_quality);
-                for (auto &r : item.regex) {
-                    r.second += searchRegex(sequence, r.first);
-                }
+                searchMotifWFilter(sequence, seq.qvalue, item.motifs);
+
+                searchRegex(sequence, seq.qvalue, item.regex);
+
                 item.reads_count++;
-                item.total_bases+=sequence.size();
+                item.total_bases += sequence.size();
 
             }
         } else {
@@ -132,15 +155,11 @@ cmri::processWorker(mapVectorMotifRegion motif_map, const std::vector<cmri::read
                 if (validate) { for (auto &c: sequence) { c = toupper(c); }}
 
                 for (auto &item : motif_map["other"]) {
-                    for (auto &m : item.motifs) {
-                        m.second += searchMotif(sequence, m.first);
-                    }
-                    searchMotifWFilter(sequence,seq.qvalue,item.motif_quality);
-                    for (auto &r : item.regex) {
-                        r.second += searchRegex(sequence, r.first);
-                    }
+
+                    searchMotifWFilter(sequence, seq.qvalue, item.motifs);
+                    searchRegex(sequence, seq.qvalue, item.regex);
                     item.reads_count++;
-                    item.total_bases+=sequence.size();
+                    item.total_bases += sequence.size();
                 }
             }
         }
@@ -151,16 +170,18 @@ cmri::processWorker(mapVectorMotifRegion motif_map, const std::vector<cmri::read
 }
 
 
-void cmri::process(const common_options_t &common_options,const motif_count_options_t &motif_count_options,mapVectorMotifRegion &motif_map) {
+void cmri::process(const common_options_t &common_options, const motif_count_options_t &motif_count_options,
+                   mapVectorMotifRegion &motif_map) {
 
-    cmri::sequenceReader reader(common_options.input_file,motif_count_options.quality_value,motif_count_options.quality_map);
+    cmri::sequenceReader reader(common_options.input_file, motif_count_options.quality_value,
+                                motif_count_options.quality_map);
     int total_reads = reader.getTotalReads();
     LOGGER.info << "Processing: " << total_reads << " reads." << std::endl;
 
     cmri::read_item_t read_item;
     int next_log = common_options.progress;
-    while(reader.get(read_item)){
-        if(!read_item.valid){continue;}
+    while (reader.get(read_item)) {
+        if (!read_item.valid) { continue; }
 
         if (motif_map.find(read_item.name) != motif_map.end()) {
             for (auto &item : motif_map[read_item.name]) {
@@ -171,15 +192,10 @@ void cmri::process(const common_options_t &common_options,const motif_count_opti
                 if (motif_count_options.validate_sequence) { for (auto &c: sequence) { c = toupper(c); }}
 
 
-                for (auto &m : item.motifs) {
-                    m.second += searchMotif(sequence, m.first);
-                }
-                searchMotifWFilter(sequence,read_item.qvalue,item.motif_quality);
-                for (auto &r : item.regex) {
-                    r.second += searchRegex(sequence, r.first);
-                }
+                searchMotifWFilter(sequence, read_item.qvalue, item.motifs);
+                searchRegex(sequence,read_item.qvalue, item.regex);
                 item.reads_count++;
-                item.total_bases+=read_item.sequence.size();
+                item.total_bases += read_item.sequence.size();
             }
         } else {
             if (motif_map.find("other") != motif_map.end()) {
@@ -188,15 +204,10 @@ void cmri::process(const common_options_t &common_options,const motif_count_opti
                 if (motif_count_options.validate_sequence) { for (auto &c: sequence) { c = toupper(c); }}
 
                 for (auto &item : motif_map["other"]) {
-                    for (auto &m : item.motifs) {
-                        m.second += searchMotif(sequence, m.first);
-                    }
-                    searchMotifWFilter(sequence,read_item.qvalue,item.motif_quality);
-                    for (auto &r : item.regex) {
-                        r.second += searchRegex(sequence, r.first);
-                    }
+                    searchMotifWFilter(sequence, read_item.qvalue, item.motifs);
+                    searchRegex(sequence,read_item.qvalue, item.regex);
                     item.reads_count++;
-                    item.total_bases+=sequence.size();
+                    item.total_bases += sequence.size();
                 }
             }
         }
@@ -213,9 +224,12 @@ void cmri::process(const common_options_t &common_options,const motif_count_opti
 }
 
 
-void cmri::processMultiThreading(const common_options_t &common_options,const motif_count_options_t &motif_count_options, mapVectorMotifRegion &motif_map) {
+void
+cmri::processMultiThreading(const common_options_t &common_options, const motif_count_options_t &motif_count_options,
+                            mapVectorMotifRegion &motif_map) {
 
-    cmri::sequenceReader reader(common_options.input_file,motif_count_options.quality_value,motif_count_options.quality_map);
+    cmri::sequenceReader reader(common_options.input_file, motif_count_options.quality_value,
+                                motif_count_options.quality_map);
     int total_reads = reader.getTotalReads();
     LOGGER.info << "Processing: " << total_reads << " reads." << std::endl;
 
@@ -223,8 +237,8 @@ void cmri::processMultiThreading(const common_options_t &common_options,const mo
 
     cmri::read_item_t read_item;
     int next_log = common_options.progress;
-    while(reader.get(read_item)){
-        if(!read_item.valid){continue;}
+    while (reader.get(read_item)) {
+        if (!read_item.valid) { continue; }
 
         sequences[reader.getCount() % common_options.threads].emplace_back(read_item);
 
@@ -232,7 +246,8 @@ void cmri::processMultiThreading(const common_options_t &common_options,const mo
 
             std::vector<std::future<mapVectorMotifRegion  >> pool;
             for (auto &seq_data : sequences) {
-                pool.push_back(std::async(std::launch::async, &processWorker, motif_map, seq_data, motif_count_options.validate_sequence));
+                pool.push_back(std::async(std::launch::async, &processWorker, motif_map, seq_data,
+                                          motif_count_options.validate_sequence));
                 seq_data.clear();
             }
             for (auto &t : pool) {
@@ -257,7 +272,8 @@ void cmri::processMultiThreading(const common_options_t &common_options,const mo
 
     std::vector<std::future<mapVectorMotifRegion>> pool;
     for (auto &seq_data : sequences) {
-        pool.push_back(std::async(std::launch::async, &processWorker, motif_map, seq_data, motif_count_options.validate_sequence));
+        pool.push_back(std::async(std::launch::async, &processWorker, motif_map, seq_data,
+                                  motif_count_options.validate_sequence));
     }
     for (auto &t : pool) {
         t.wait();
@@ -274,27 +290,25 @@ void cmri::processMultiThreading(const common_options_t &common_options,const mo
 }
 
 
-
-
-void cmri::mainMotifCount(const common_options_t &common_options, const motif_count_options_t &motif_count_options){
+void cmri::mainMotifCount(const common_options_t &common_options, const motif_count_options_t &motif_count_options) {
 
 
     boost::property_tree::ptree input_tree;
     boost::property_tree::read_json(motif_count_options.motif_file, input_tree);
     mapVectorMotifRegion motifs;
-    cmri::deserialize(input_tree,motifs);
+    cmri::deserialize(input_tree, motifs);
 
     if (motifs.empty()) {
         cmri::LOGGER.error << "From: " << __FILE__ << ":" << __LINE__ << std::endl;
         cmri::LOGGER.error << "Invalid argument. No valid motif list found!" << std::endl;
-        exit (EINVAL);
+        exit(EINVAL);
     }
 
 
     if (common_options.threads > 1) {
         cmri::processMultiThreading(common_options, motif_count_options, motifs);
     } else {
-        cmri::process(common_options,motif_count_options, motifs);
+        cmri::process(common_options, motif_count_options, motifs);
     }
 
     std::ofstream file(common_options.output_path + "/output.json");
