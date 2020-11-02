@@ -33,6 +33,7 @@
 #include "utils.h"
 #include "options.h"
 #include "Modules/IwgsAnalysis/iwgsAnalysis.h"
+#include "Modules/TelomereMutations/telomereMutations.h"
 
 
 int main(const int ac, char *av[]) {
@@ -49,7 +50,7 @@ int main(const int ac, char *av[]) {
         genericOptions.add_options()
                 ("debug,d", "Shows debug messages in log")
                 ("help,h", "Shows a help message")
-                ("task", boost::program_options::value<std::string>(&task), "Perform one of the following tasks: [MotifCount, GenomeAnalysis, VariantCallAnalysis, IwgsAnalysis]")
+                ("task", boost::program_options::value<std::string>(&task), "Perform one of the following tasks: [MotifCount, GenomeAnalysis, VariantCallAnalysis, IwgsAnalysis, TelomereMutations]")
                 ("parameters,p", boost::program_options::value<std::string>(&parameters), "Parameters file")
                 ("silent,s", "Shows only errors");
 
@@ -95,6 +96,15 @@ int main(const int ac, char *av[]) {
                 ("iwgs_analysis.input_file", boost::program_options::value<std::string>(&iwgs_analysis.input_file), "Second fastq input file (required if pair-ended)")
                 ;
 
+        cmri::telomere_mutations_options_t telomere_mutations;
+        boost::program_options::options_description telomereMutationsOptions("Telomere mutation Analysis Options:");
+        iwgsAnalysisOptions.add_options()
+                ("telomere_mutations.target_file", boost::program_options::value<std::string>(&telomere_mutations.target_file), "Reference file.")
+                ("telomere_mutations.query_file", boost::program_options::value<std::string>(&telomere_mutations.query_file), "Input file.")
+                ;
+
+
+
         boost::program_options::positional_options_description positional;
         positional.add("task", 1);
 
@@ -105,6 +115,7 @@ int main(const int ac, char *av[]) {
         .add(variantCallAnalysisOptions)
         .add(genomeAnalysisOptions)
         .add(iwgsAnalysisOptions)
+        .add(telomereMutationsOptions)
                 ;
 
         boost::program_options::options_description configFileOptions;
@@ -113,6 +124,7 @@ int main(const int ac, char *av[]) {
         .add(variantCallAnalysisOptions)
         .add(genomeAnalysisOptions)
         .add(iwgsAnalysisOptions)
+        .add(telomereMutationsOptions)
                 ;
 
         boost::program_options::variables_map vm;
@@ -152,27 +164,35 @@ int main(const int ac, char *av[]) {
         cmri::welcome("GEAR, Genomic sEquence AnalyzeR.");
 
         cmri::show_options(vm);
-        common.validate();
 
         if(task == "MotifCount") {
             motif_count.validate();
+            common.validate();
             cmri::mainMotifCount(common,motif_count);
         }
         else {
             if (task == "VariantCallAnalysis") {
                 variant_call_analysis.validate();
+                common.validate();
                 cmri::mainVariantCallAnalysis(common, variant_call_analysis);
             }else{
                 if (task == "GenomeAnalysis") {
                     genome_analysis.validate();
+                    common.validate();
                     cmri::mainGenomeAnalysis(common, genome_analysis);
                 }else{
                     if (task == "IwgsAnalysis") {
                         iwgs_analysis.validate();
+                        common.validate();
                         cmri::mainIwgsAnalysis(common, iwgs_analysis);
                     }else{
-                        cmri::LOGGER.error << "Unknown task: " << task;
-                        std::cerr << cmdlineOptions << std::endl;
+                        if (task == "TelomereMutations") {
+                            telomere_mutations.validate();
+                            cmri::mainTelomereMutations(common, telomere_mutations);
+                        }else{
+                            cmri::LOGGER.error << "Unknown task: " << task;
+                            std::cerr << cmdlineOptions << std::endl;
+                        }
                     }
                 }
             }

@@ -81,6 +81,21 @@ namespace cmri {
     };
 
 
+    struct telomere_mutations_options_t {
+
+        std::string target_file;
+        std::string query_file;
+
+        void validate() {
+            //test if files exists.
+            cmri::open_file(target_file, "expecting target file").close();
+            cmri::open_file(query_file, "expecting query file").close();
+        }
+
+
+    };
+
+
 }
 
 

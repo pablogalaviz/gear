@@ -258,6 +258,40 @@ namespace cmri {
         return result;
     }
 
+    template<class T>
+    inline std::string serialize(const T &item) {
+        std::stringstream sample_data;
+        sample_data << item;
+        return sample_data.str();
+    };
+
+
+    template<class T>
+    std::string serialize(const std::vector<T> &vector_data) {
+        std::stringstream result;
+        result << "[";
+        int list_size= vector_data.size();
+        for(int i=0; i < list_size; i++){
+            result << serialize(vector_data[i]) << (i<list_size-1 ? "," :"");
+        }
+        result << "]";
+        return result.str();
+    };
+
+    template<class S, class T>
+    std::string serialize(const std::map<S,T> &map_data) {
+        std::stringstream result;
+        result << "{";
+        for(auto iter_data = map_data.begin(); iter_data != map_data.end(); ++iter_data){
+            result << "\"" << iter_data->first << "\":";
+            result << serialize(iter_data->second);
+            result << (std::next(iter_data) != map_data.end() ? "," : "");
+        }
+        result << "}";
+
+        return result.str();
+    };
+
 
 }
 
