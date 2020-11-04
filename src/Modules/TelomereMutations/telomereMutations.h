@@ -61,6 +61,9 @@ namespace cmri {
         int rs;
         int re;
         int mapq;
+        int mlen;
+        int blen;
+        double score=0;
         std::map<int, std::vector<sbs_t>> sbs;
         std::map<int, std::vector<indel_t>> indels;
 
@@ -70,13 +73,37 @@ namespace cmri {
             result << "\"rs\":" << rs << ",";
             result << "\"re\":" << re << ",";
             result << "\"mapq\":" << mapq << ",";
+            result << "\"mlen\":" << mlen << ",";
+            result << "\"blen\":" << blen << ",";
+            result << "\"score\":" << score << ",";
 
             result << "\"sbs\":" << ::cmri::serialize(sbs) << ",";
+            result << "\"indels\":" << ::cmri::serialize(indels) << ",";
 
             result << "\"name\":\"" << name << "\"";
             result << "}";
             return result.str();
         };
+
+        void find_mutations(){
+
+            for(auto &item : sbs){
+                char motif[] = {'T','T','A','G','G','G'};
+                for(auto &s : item.second){
+                    motif[s.pos]=s.value;
+                }
+
+                std::string mutation = "";
+                for(auto &c : motif){
+                    mutation+=c;
+                }
+
+                LOGGER.warning << item.first << " " << mutation << std::endl;
+            }
+
+        }
+
+
 
     };
 

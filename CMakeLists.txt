@@ -56,16 +56,15 @@ add_executable(gear
 
 #BOOST SETUP
 set(BOOST_ROOT "/opt/boost")
-set(Boost_USE_STATIC_LIBS ON)
+set(Boost_USE_STATIC_LIBS OFF)
 set(Boost_USE_MULTITHREADED ON)
-set(Boost_USE_STATIC_RUNTIME ON)
+set(Boost_USE_STATIC_RUNTIME OFF)
 
 find_package(Boost COMPONENTS program_options  iostreams  filesystem system REQUIRED)
 
 if(NOT Boost_FOUND)
     message(FATAL_ERROR "Could not find boost!")
 endif()
-
 
 #HSTlib SETUP
 message(STATUS "Manually setting htslib up.")
@@ -89,7 +88,7 @@ include_directories(${HTSLIB_INCLUDE_DIR})
 find_package(ZLIB REQUIRED)
 find_package (Threads REQUIRED)
 
-target_link_libraries(gear ${Boost_LIBRARIES} ${HTSLIB_LIBRARY} ZLIB::ZLIB ${CMAKE_THREAD_LIBS_INIT} Boost::iostreams  Boost::filesystem Boost::system ${CMAKE_SOURCE_DIR}/lib/libminimap2.a)
+target_link_libraries(gear ${Boost_LIBRARIES} ${HTSLIB_LIBRARY} ZLIB::ZLIB ${CMAKE_THREAD_LIBS_INIT} Boost::iostreams  Boost::filesystem Boost::system ${CMAKE_SOURCE_DIR}/lib/${CMAKE_HOST_SYSTEM_NAME}/libminimap2.a)
 add_subdirectory(${PROJECT_SOURCE_DIR}/test)
 install(TARGETS gear DESTINATION rel CONFIGURATIONS Release)
 

@@ -69,6 +69,10 @@ cmri::mainTelomereMutations(common_options_t common_options, telomere_mutations_
             mm_reg1_t *reg;
             int j, i, n_reg;
             reg = mm_map(mi, ks->seq.l, ks->seq.s, &n_reg, tbuf, &mopt, 0); // get all hits for the query
+
+            mutations_t mut;
+            mut.score=0;
+
             for (j = 0; j < n_reg; ++j) { // traverse hits and print them out
                 mm_reg1_t *r = &reg[j];
                 assert(r->p); // with MM_F_CIGAR, this should not be NULL
@@ -167,19 +171,28 @@ cmri::mainTelomereMutations(common_options_t common_options, telomere_mutations_
 
                 }
 
-                mutations_t mut;
-                mut.name= ks->name.s;
-                mut.rs = r->rs;
-                mut.re = r->re;
-                mut.mapq = r->mapq;
-                mut.indels=indels;
-                mut.sbs=sbs;
-                mutations.push_back(mut);
-
+                double score = ( static_cast<double>(r->blen+ r->mlen)/ks->seq.l + r->mapq/60.0)/3.0;
+                if(mut.score < score) {
+                    mut.name = ks->name.s;
+                    mut.rs = r->rs;
+                    mut.re = r->re;
+                    mut.mapq = r->mapq;
+                    mut.indels = indels;
+                    mut.sbs = sbs;
+                    mut.blen = r->blen;
+                    mut.mlen = r->mlen;
+                    mut.score = score;
+                }
 
                 free(cs_str);
                 free(r->p);
             }
+
+            if(mut.score > 0) {
+                mut.find_mutations();
+                mutations.push_back(mut);
+            }
+
             free(reg);
         }
 
