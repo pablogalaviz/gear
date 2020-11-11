@@ -67,6 +67,17 @@ namespace cmri {
         std::map<int, std::vector<sbs_t>> sbs;
         std::map<int, std::vector<indel_t>> indels;
 
+        std::map<std::string,int> count;
+        std::vector<int> sequence_position;
+
+        double mean_ins_size=0;
+        double mean_ins_qv=0;
+        int ins_count=0;
+
+        double mean_del_size=0;
+        double mean_del_qv=0;
+        int del_count=0;
+
         std::string serialize() const {
             std::stringstream result;
             result << "{";
@@ -76,9 +87,18 @@ namespace cmri {
             result << "\"mlen\":" << mlen << ",";
             result << "\"blen\":" << blen << ",";
             result << "\"score\":" << score << ",";
+            result << "\"count\":" << cmri::serialize(count) << ",";
 
-            result << "\"sbs\":" << ::cmri::serialize(sbs) << ",";
-            result << "\"indels\":" << ::cmri::serialize(indels) << ",";
+            result << "\"mean_ins_size\":" << mean_ins_size << ",";
+            result << "\"mean_ins_qv\":" << mean_ins_qv << ",";
+            result << "\"ins_count\":" << ins_count << ",";
+
+            result << "\"mean_del_size\":" << mean_del_size << ",";
+            result << "\"mean_del_qv\":" << mean_del_qv << ",";
+            result << "\"del_count\":" << del_count << ",";
+
+//            result << "\"sbs\":" << ::cmri::serialize(sbs) << ",";
+//            result << "\"indels\":" << ::cmri::serialize(indels) << ",";
 
             result << "\"name\":\"" << name << "\"";
             result << "}";
@@ -88,6 +108,11 @@ namespace cmri {
         void find_mutations(){
 
             for(auto &item : sbs){
+
+                if(item.second.size()>1){
+                    continue;
+                }
+
                 char motif[] = {'T','T','A','G','G','G'};
                 for(auto &s : item.second){
                     motif[s.pos]=s.value;
@@ -98,7 +123,45 @@ namespace cmri {
                     mutation+=c;
                 }
 
-                LOGGER.warning << item.first << " " << mutation << std::endl;
+                if(count.find(mutation) == count.end()){
+                    count[mutation]=1;
+                }
+                else{
+                    count[mutation]+=1;
+                }
+                sequence_position.push_back(item.first);
+
+            }
+
+            for(auto &item : indels){
+
+                for(auto &i : item.second){
+                    if(i.kind == "ins"){
+                        ins_count++;
+                        mean_ins_size+=i.seq.size();
+                        mean_ins_qv+=i.mean_qv;
+//                        if(i.seq.size()==1){
+
+//                        }
+
+                    }
+                    else{
+                        del_count++;
+                        mean_del_size+=i.seq.size();
+                        mean_del_qv+=i.mean_qv;
+                    }
+                    LOGGER.debug << i.serialize() << std::endl;
+                }
+
+                if (ins_count > 0){
+                    mean_ins_qv/= ins_count;
+                    mean_ins_size/=ins_count;
+                }
+                if (del_count > 0){
+                    mean_del_qv/= del_count;
+                    mean_del_size/=del_count;
+                }
+
             }
 
         }
