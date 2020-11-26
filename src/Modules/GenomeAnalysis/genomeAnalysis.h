@@ -25,11 +25,41 @@
 //
 
 #include <options.h>
+#include "minimap.h"
 
-namespace cmri{
+namespace cmri {
 
-   void mainGenomeAnalysis(const common_options_t &common_options, const genome_analysis_options_t &telomere_options);
 
+    struct bed_region_t {
+        std::string chrom;
+        unsigned long chromStart;
+        unsigned long chromEnd;
+        std::string name;
+        unsigned int score;
+        char strand;
+
+        unsigned long thickStart;
+        unsigned long thickEnd;
+
+    };
+
+    class genomeAnalysis {
+
+        mm_idxopt_t iopt;
+        mm_mapopt_t mopt;
+        int n_threads = 3;
+        mm_idx_reader_t *index_reader;
+        mm_idx_t *mi;
+        std::string target_file;
+
+    public:
+        genomeAnalysis(const genome_analysis_options_t &options);
+
+        std::vector<cmri::bed_region_t> process(const std::string sequence,const std::string chrom);
+
+    };
+
+    void mainGenomeAnalysis(const common_options_t &common_options, const genome_analysis_options_t &telomere_options);
 
 }
 
