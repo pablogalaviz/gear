@@ -59,10 +59,12 @@ namespace cmri {
 
     struct genome_analysis_options_t {
         std::string regions;
+        std::string target_file;
         bool validate_sequence;
 
         void validate() const {
             cmri::open_file(regions,"expecting region description file.").close();
+            cmri::open_file(target_file,"expecting fasta telomere reference file.").close();
         }
     };
 

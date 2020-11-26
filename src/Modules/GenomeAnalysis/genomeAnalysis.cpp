@@ -30,8 +30,11 @@
 //
 
 
+
 void cmri::mainGenomeAnalysis(const common_options_t &common_options,
                               const genome_analysis_options_t &telomere_options) {
+
+    genomeAnalysis ga(telomere_options);
 
     boost::property_tree::ptree region_data;
     boost::property_tree::read_json(telomere_options.regions, region_data);
@@ -130,6 +133,22 @@ void cmri::mainGenomeAnalysis(const common_options_t &common_options,
             }
 
 
+            auto bed_regions = ga.process(sequence,chromosome);
+
+            std::ofstream file(common_options.output_path + "/output_t.bed",std::ofstream::app);
+            for(auto & item : bed_regions) {
+                file << item.chrom << "\t"
+                        << item.chromStart << "\t"
+                        << item.chromEnd << "\t"
+                        << item.name << "\t"
+                        << item.score << "\t"
+                        << item.strand << "\t"
+                        << item.thickStart << "\t"
+                        << item.thickEnd // << "\t"
+                        << std::endl;
+            }
+            file.close();
+
 
         }
     }
@@ -139,5 +158,98 @@ void cmri::mainGenomeAnalysis(const common_options_t &common_options,
     file << cmri::serialize(regions);
     file.close();
 
+
+}
+
+cmri::genomeAnalysis::genomeAnalysis(const genome_analysis_options_t &options) {
+
+
+    mm_verbose = 2; // disable message output to stderr
+    mm_set_opt(0, &iopt, &mopt);
+    mopt.flag |= MM_F_CIGAR; // perform alignment
+    mopt.flag |= MM_F_OUT_CG; // perform alignment
+
+    // open index reader
+    target_file=options.target_file;
+
+
+}
+
+std::vector<cmri::bed_region_t> cmri::genomeAnalysis::process(const std::string sequence,const std::string chrom) {
+
+    std::vector<bed_region_t> result;
+
+    // open index reader
+    index_reader=mm_idx_reader_open(target_file.c_str(), &iopt, 0);
+
+    while ((mi = mm_idx_reader_read(index_reader, n_threads)) != 0) { // traverse each part of the index
+        mm_mapopt_update(&mopt,
+                         mi); // this sets the maximum minimizer occurrence; TODO: set a better default in mm_mapopt_init()!
+        mm_tbuf_t *tbuf = mm_tbuf_init(); // thread buffer; for multi-threading, allocate one tbuf for each thread
+        unsigned long start =0;
+        unsigned long size = std::min(150UL,sequence.size()-start);
+        while(start+size < sequence.size())
+        { // each kseq_read() call reads one query sequence
+            mm_reg1_t *reg;
+            int j, i, n_reg;
+            std::string subsequence = sequence.substr(start, size);
+            reg = mm_map(mi, size, subsequence.c_str(), &n_reg, tbuf, &mopt, 0); // get all hits for the query
+
+            bed_region_t region;
+            region.chrom=chrom;
+            region.score=0;
+            for (j = 0; j < n_reg; ++j) { // traverse hits and print them out
+                mm_reg1_t *r = &reg[j];
+                assert(r->p); // with MM_F_CIGAR, this should not be NULL
+
+                LOGGER.debug << "len:"
+                             << size << "\tqs:"
+                             << start << "\tqe:"
+                             << start+size << "\t"
+                             << "+-"[r->rev] << std::endl;
+
+                LOGGER.debug << mi->seq[r->rid].name << "\tlen:"
+                             << mi->seq[r->rid].len << "\trs:"
+                             << r->qs << "\tre:"
+                             << r->qe << "\tmlen:"
+                             << r->mlen << "\tblen:"
+                             << r->blen << "\tmapq:"
+                             << r->mapq << "\t cg ";
+
+
+                void *km = nullptr;
+                char *cs_str = NULL;
+                int max_len = 0;
+                int n_cs = mm_gen_cs(km, &cs_str, &max_len, mi, r, subsequence.c_str(), true);
+
+                LOGGER.debug << cs_str << std::endl;
+                LOGGER.debug << subsequence << std::endl;
+
+                unsigned int score = static_cast<unsigned int>(std::round((( static_cast<double>(r->blen+ r->mlen)/size + r->mapq/60.0)/3.0)*1000));
+
+                if(region.score < score){
+                    region.name = "Telomere";
+                    region.score = score;
+                    region.chromStart = start;
+                    region.chromEnd = start + size;
+                    region.thickStart = start + r->qs;
+                    region.thickEnd = start + r->qe;
+                    region.strand = "+-"[r->rev];
+                }
+
+            }
+
+            if(region.score > 0) {
+                result.push_back(region);
+            }
+            size = std::min(150UL,sequence.size()-start);
+            start += std::min(50UL,sequence.size()-start);
+
+
+        }
+
+    }
+
+    return result;
 
 }

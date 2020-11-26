@@ -193,7 +193,6 @@ namespace cmri {
 
     int mainTelomereMutations(common_options_t common_options, telomere_mutations_options_t telomere_mutation_options );
 
-   std::vector<std::pair<char,std::string>> parseTag(std::string tag);
 
 }
 

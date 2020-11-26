@@ -11,27 +11,7 @@
 #include "minimap.h"
 
 
-std::vector<std::pair<char, std::string>> cmri::parseTag(std::string tag) {
-    std::vector<std::pair<char, std::string>> result;
 
-    std::string value;
-    char state = ' ';
-
-    for (auto &t : tag) {
-        if (t == ':' || t == '+' || t == '-' || t == '*') {
-            if (state != ' ') {
-                result.push_back(std::make_pair(state, value));
-                value = "";
-            }
-            state = t;
-        } else {
-            value += t;
-        }
-    }
-
-    return result;
-
-}
 
 
 int

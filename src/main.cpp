@@ -86,6 +86,7 @@ int main(const int ac, char *av[]) {
         boost::program_options::options_description genomeAnalysisOptions("Genome Analysis Options:");
         genomeAnalysisOptions.add_options()
                 ("genome_analysis.regions", boost::program_options::value<std::string>(&genome_analysis.regions), "Chromosome region definition in json format")
+                ("genome_analysis.target_file", boost::program_options::value<std::string>(&genome_analysis.target_file), "Telomere template in fasta format")
                 ("genome_analysis.validate", boost::program_options::value<bool>(&genome_analysis.validate_sequence)->default_value(true), "Validate sequence (slow for long contigs)")
                 ;
 
