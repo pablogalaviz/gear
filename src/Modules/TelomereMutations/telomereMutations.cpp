@@ -9,9 +9,7 @@
 #include <stdio.h>
 #include <zlib.h>
 #include "minimap.h"
-#include "kseq.h"
 
-KSEQ_INIT(gzFile, gzread)
 
 std::vector<std::pair<char, std::string>> cmri::parseTag(std::string tag) {
     std::vector<std::pair<char, std::string>> result;
@@ -182,6 +180,7 @@ cmri::mainTelomereMutations(common_options_t common_options, telomere_mutations_
                     mut.blen = r->blen;
                     mut.mlen = r->mlen;
                     mut.score = score;
+                    mut.seq = que;
                 }
 
                 free(cs_str);

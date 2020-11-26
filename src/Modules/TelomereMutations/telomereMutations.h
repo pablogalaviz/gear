@@ -5,8 +5,7 @@
 #ifndef GEAR_TELOMEREMUTATIONS_H
 #define GEAR_TELOMEREMUTATIONS_H
 
-#include "options.h"
-#include "utils.h"
+#include "../MotifCount/motifCount.h"
 
 namespace cmri {
 
@@ -63,11 +62,16 @@ namespace cmri {
         int mapq;
         int mlen;
         int blen;
+
+        std::string seq;
+
+
         double score=0;
         std::map<int, std::vector<sbs_t>> sbs;
         std::map<int, std::vector<indel_t>> indels;
 
         std::map<std::string,int> count;
+        double mean_qv=0;
         std::vector<int> sequence_position;
 
         double mean_ins_size=0;
@@ -88,6 +92,7 @@ namespace cmri {
             result << "\"blen\":" << blen << ",";
             result << "\"score\":" << score << ",";
             result << "\"count\":" << cmri::serialize(count) << ",";
+            result << "\"mean_qv\":" << mean_qv << ",";
 
             result << "\"mean_ins_size\":" << mean_ins_size << ",";
             result << "\"mean_ins_qv\":" << mean_ins_qv << ",";
@@ -96,6 +101,7 @@ namespace cmri {
             result << "\"mean_del_size\":" << mean_del_size << ",";
             result << "\"mean_del_qv\":" << mean_del_qv << ",";
             result << "\"del_count\":" << del_count << ",";
+            result << "\"seq\":\"" << seq << "\",";
 
 //            result << "\"sbs\":" << ::cmri::serialize(sbs) << ",";
 //            result << "\"indels\":" << ::cmri::serialize(indels) << ",";
@@ -107,15 +113,18 @@ namespace cmri {
 
         void find_mutations(){
 
+            int mutation_count=0;
             for(auto &item : sbs){
 
-                if(item.second.size()>1){
+                if(item.second.size()!=1){
                     continue;
                 }
 
                 char motif[] = {'T','T','A','G','G','G'};
                 for(auto &s : item.second){
                     motif[s.pos]=s.value;
+                    mean_qv += s.qv;
+                    mutation_count++;
                 }
 
                 std::string mutation = "";
@@ -129,8 +138,13 @@ namespace cmri {
                 else{
                     count[mutation]+=1;
                 }
+                count["TTAGGG"]=searchMotif(seq,"TTAGGG");
                 sequence_position.push_back(item.first);
 
+            }
+
+            if(mutation_count>0) {
+                mean_qv /= mutation_count;
             }
 
             for(auto &item : indels){
@@ -150,7 +164,7 @@ namespace cmri {
                         mean_del_size+=i.seq.size();
                         mean_del_qv+=i.mean_qv;
                     }
-                    LOGGER.debug << i.serialize() << std::endl;
+                    //LOGGER.debug << i.serialize() << std::endl;
                 }
 
                 if (ins_count > 0){
