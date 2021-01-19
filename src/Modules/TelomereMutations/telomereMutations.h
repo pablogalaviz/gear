@@ -5,6 +5,7 @@
 #ifndef GEAR_TELOMEREMUTATIONS_H
 #define GEAR_TELOMEREMUTATIONS_H
 
+#include <regex>
 #include "options.h"
 #include "utils.h"
 
@@ -60,14 +61,19 @@ namespace cmri {
         std::string name;
         int rs;
         int re;
+        int qs;
+        int qe;
+        int seq_len;
         int mapq;
         int mlen;
         int blen;
         double score=0;
+        std::string seq;
         std::map<int, std::vector<sbs_t>> sbs;
         std::map<int, std::vector<indel_t>> indels;
 
         std::map<std::string,int> count;
+        std::map<std::string,int> variants;
         std::vector<int> sequence_position;
 
         double mean_ins_size=0;
@@ -78,16 +84,30 @@ namespace cmri {
         double mean_del_qv=0;
         int del_count=0;
 
+        std::string cs_str;
+
+
         std::string serialize() const {
             std::stringstream result;
             result << "{";
             result << "\"rs\":" << rs << ",";
             result << "\"re\":" << re << ",";
+            result << "\"qs\":" << qs << ",";
+            result << "\"qe\":" << qe << ",";
+            result << "\"seq_len\":" << seq_len << ",";
             result << "\"mapq\":" << mapq << ",";
             result << "\"mlen\":" << mlen << ",";
             result << "\"blen\":" << blen << ",";
             result << "\"score\":" << score << ",";
-            result << "\"count\":" << cmri::serialize(count) << ",";
+
+            /*
+            for(auto &item : count){
+                result << "\"" <<item.first <<"\":" << item.second << ",";
+            }
+            */
+            for(auto &item : variants){
+                result << "\"" <<item.first <<"\":" << item.second << ",";
+            }
 
             result << "\"mean_ins_size\":" << mean_ins_size << ",";
             result << "\"mean_ins_qv\":" << mean_ins_qv << ",";
@@ -97,9 +117,11 @@ namespace cmri {
             result << "\"mean_del_qv\":" << mean_del_qv << ",";
             result << "\"del_count\":" << del_count << ",";
 
-//            result << "\"sbs\":" << ::cmri::serialize(sbs) << ",";
-//            result << "\"indels\":" << ::cmri::serialize(indels) << ",";
+            result << "\"sbs\":" << ::cmri::serialize(sbs) << ",";
+            result << "\"indels\":" << ::cmri::serialize(indels) << ",";
 
+            result << "\"seq\":\"" << seq << "\",";
+            result << "\"cs_str\":\"" << cs_str << "\",";
             result << "\"name\":\"" << name << "\"";
             result << "}";
             return result.str();
@@ -167,12 +189,38 @@ namespace cmri {
         }
 
 
-
     };
 
     inline std::ostream& operator<<(std::ostream& result, const mutations_t& rhs)
     {
         result << rhs.serialize();
+        return result;
+    }
+
+
+inline   std::map<std::string,int> find_variants(std::string sequence){
+        std::map<std::string,int> result;
+
+        std::regex basic_regex("TTAGGG|ATAGGG|GTAGGG|CTAGGG|TAAGGG|TGAGGG|TCAGGG|TTCGGG|TTTGGG|TTGGGG|TTACGG|TTATGG|TTAAGG|TTAGCG|TTAGTG|TTAGAG|TTAGGC|TTAGGT|TTAGGA");
+        std::smatch match;
+
+        while (std::regex_search(sequence, match, basic_regex)) {
+            // suffix to find the rest of the string.
+            std::string prefix = match.prefix().str();
+            if (!prefix.empty()) {
+                if (result.find(prefix) == result.end()) {
+                    result[prefix] = 1;
+                } else {
+                    result[prefix] += 1;
+                }
+            }
+            sequence = match.suffix().str();
+        }
+/*
+        for(auto & item : result){
+            LOGGER.debug << item.first << " : " << item.second << std::endl;
+        }
+*/
         return result;
     }
 

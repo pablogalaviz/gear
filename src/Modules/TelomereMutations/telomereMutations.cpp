@@ -6,10 +6,11 @@
 
 #include <stdlib.h>
 #include <assert.h>
-#include <stdio.h>
 #include <zlib.h>
 #include "minimap.h"
 #include "kseq.h"
+#include <cmath>
+#include <algo/blast/blastinput/blast_input.hpp>
 
 KSEQ_INIT(gzFile, gzread)
 
@@ -18,6 +19,9 @@ KSEQ_INIT(gzFile, gzread)
 
 int
 cmri::mainTelomereMutations(common_options_t common_options, telomere_mutations_options_t telomere_mutation_options) {
+
+    //ncbi::blast::SDataLoaderConfig dlconfig(false);
+
 
     mm_idxopt_t iopt;
     mm_mapopt_t mopt;
@@ -127,7 +131,7 @@ cmri::mainTelomereMutations(common_options_t common_options, telomere_mutations_
                             std::string kind = item.first == '-' ? "del" : "ins";
                             LOGGER.debug << kind << " " << item.second << std::endl;
                             indel_t del = {kind, rs % 6, item.second, sum / size};
-                            indels[int(ceil(rs / 6))].push_back(del);
+                            indels[int(std::ceil(rs / 6))].push_back(del);
                             if (item.first == '-') {
                                 rs += size;
                             } else {
@@ -138,7 +142,7 @@ cmri::mainTelomereMutations(common_options_t common_options, telomere_mutations_
                         case '*': {
                             LOGGER.debug << "SBS: " << item.second << " " << que[qs] << std::endl;
                             sbs_t m = {rs % 6, que[qs], qv[qs]};
-                            sbs[int(ceil(rs / 6))].push_back(m);
+                            sbs[int(std::ceil(rs / 6))].push_back(m);
                             size = item.second.size() / 2;
                             rs += size;
                             qs += size;
@@ -156,12 +160,18 @@ cmri::mainTelomereMutations(common_options_t common_options, telomere_mutations_
                     mut.name = ks->name.s;
                     mut.rs = r->rs;
                     mut.re = r->re;
+                    mut.qs = r->qs;
+                    mut.qe = r->qe;
+                    mut.seq_len = ks->seq.l;
                     mut.mapq = r->mapq;
                     mut.indels = indels;
                     mut.sbs = sbs;
                     mut.blen = r->blen;
                     mut.mlen = r->mlen;
                     mut.score = score;
+                    mut.variants = find_variants(que);
+                    mut.seq = que;
+                    mut.cs_str = cs_str;
                 }
 
                 free(cs_str);

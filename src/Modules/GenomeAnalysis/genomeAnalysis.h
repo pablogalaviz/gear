@@ -30,16 +30,20 @@
 namespace cmri {
 
 
+    enum class region_state_t : int { COMPLETE=0, EXTEND=1, REDUCE=2 };
+
     struct bed_region_t {
         std::string chrom;
-        unsigned long chromStart;
-        unsigned long chromEnd;
-        std::string name;
-        unsigned int score;
-        char strand;
+        unsigned long chromStart=0;
+        unsigned long chromEnd=0;
+        std::string name="";
+        unsigned int score=0;
+        char strand='+';
+        unsigned long thickStart=0;
+        unsigned long thickEnd=0;
 
-        unsigned long thickStart;
-        unsigned long thickEnd;
+        region_state_t state;
+        bool is_telomere;
 
     };
 
@@ -52,8 +56,12 @@ namespace cmri {
         mm_idx_t *mi;
         std::string target_file;
 
+        cmri::bed_region_t find_telomere(const std::string &sequence, const cmri::bed_region_t &previous_region, const std::string::size_type &start, const std::string::size_type &end);
+
     public:
         genomeAnalysis(const genome_analysis_options_t &options);
+
+
 
         std::vector<cmri::bed_region_t> process(const std::string sequence,const std::string chrom);
 
