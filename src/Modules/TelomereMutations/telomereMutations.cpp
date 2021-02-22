@@ -9,6 +9,7 @@
 #include <zlib.h>
 #include "minimap.h"
 #include "kseq.h"
+#include <cmath>
 
 KSEQ_INIT(gzFile, gzread)
 
