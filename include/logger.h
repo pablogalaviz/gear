@@ -78,7 +78,6 @@ namespace cmri
                        << m_label
                        << std::put_time(&tm, "[%F %T] | ")
                        << (console ? "\033[0m" : "");
-                    m_new_line = false;
                 }
                 ss << out;
 
@@ -119,7 +118,7 @@ namespace cmri
                         else
                             std::cout << get_formatted_stream(out,true).str();
                     }
-
+                    if(m_new_line){ m_new_line = false;}
                 }
                 return *this;
             }
