@@ -72,11 +72,13 @@ namespace cmri {
     struct iwgs_analysis_options_t {
         std::string input_file;
         std::string variants_file;
+        int count_filter_threshold;
 
         void validate() {
             //test if files exists.
             cmri::open_file(input_file, "expecting input file").close();
             cmri::open_file(variants_file, "expecting variants file").close();
+            count_filter_threshold = std::max(1,count_filter_threshold);
         }
 
 

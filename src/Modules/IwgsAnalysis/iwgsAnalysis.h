@@ -26,7 +26,7 @@ namespace cmri {
         int count_filter_threshold;
     public:
         iwgsAnalysis(const std::string &motif, const std::vector<std::string> &variants, int countFilterThreshold);
-        int consecutive_count(const std::string &name, const std::string &sequence, const std::string &quality);
+        bool consecutive_count(const std::string &name, const std::string &sequence, const std::string &quality);
 
         bool count_filter(std::string name, std::string sequence, std::string quality);
 

@@ -56,7 +56,7 @@ int main(const int ac, char *av[]) {
 
 
         cmri::common_options_t common;
-        boost::program_options::options_description commonOptions("Common Options:");
+        boost::program_options::options_description commonOptions("Common Options");
         commonOptions.add_options()
                 ("common.backup", boost::program_options::value<bool>(&common.backup)->default_value(true), "Create a backup of previous output")
                 ("common.chunk_size", boost::program_options::value<int>(&common.chunk_size)->default_value(10000), "Size of the reading chuck")
@@ -67,7 +67,7 @@ int main(const int ac, char *av[]) {
                 ;
 
         cmri::motif_count_options_t motif_count;
-        boost::program_options::options_description motifCountOptions("Motif Count Options:");
+        boost::program_options::options_description motifCountOptions("Motif Count Options");
         motifCountOptions.add_options()
                 ("motif_count.motifs", boost::program_options::value<std::string>(&motif_count.motif_file), "Motif per region definition in json format")
                 ("motif_count.quality_value", boost::program_options::value<int>(&motif_count.quality_value)->default_value(0), "Mean base quality threshold")
@@ -76,29 +76,31 @@ int main(const int ac, char *av[]) {
         ;
 
         cmri::variant_call_analysis_options_t variant_call_analysis;
-        boost::program_options::options_description variantCallAnalysisOptions("Variant Call Analysis Options:");
+        boost::program_options::options_description variantCallAnalysisOptions("Variant Call Analysis Options");
         variantCallAnalysisOptions.add_options()
                 ("variant_call_analysis.regions", boost::program_options::value<std::string>(&variant_call_analysis.regions), "Variants per region definition in json format")
                 ("variant_call_analysis.reference", boost::program_options::value<std::string>(&variant_call_analysis.reference), "Fasta reference (required index).")
                 ;
 
         cmri::genome_analysis_options_t genome_analysis;
-        boost::program_options::options_description genomeAnalysisOptions("Genome Analysis Options:");
+        boost::program_options::options_description genomeAnalysisOptions("Genome Analysis Options");
         genomeAnalysisOptions.add_options()
                 ("genome_analysis.regions", boost::program_options::value<std::string>(&genome_analysis.regions), "Chromosome region definition in json format")
                 ("genome_analysis.target_file", boost::program_options::value<std::string>(&genome_analysis.target_file), "Telomere template in fasta format")
                 ("genome_analysis.validate", boost::program_options::value<bool>(&genome_analysis.validate_sequence)->default_value(true), "Validate sequence (slow for long contigs)")
                 ;
 
+        //count_filter_threshold
         cmri::iwgs_analysis_options_t iwgs_analysis;
-        boost::program_options::options_description iwgsAnalysisOptions("Illumina WGS Analysis Options:");
+        boost::program_options::options_description iwgsAnalysisOptions("Illumina WGS Analysis Options");
         iwgsAnalysisOptions.add_options()
                 ("iwgs_analysis.variant_file", boost::program_options::value<std::string>(&iwgs_analysis.variants_file), "File with variants description in json format.")
                 ("iwgs_analysis.input_file", boost::program_options::value<std::string>(&iwgs_analysis.input_file), "Second fastq input file (required if pair-ended)")
+                ("iwgs_analysis.count_filter_threshold", boost::program_options::value<int>(&iwgs_analysis.count_filter_threshold)->default_value(5), "Threshold value ion motif filtering")
                 ;
 
         cmri::telomere_mutations_options_t telomere_mutations;
-        boost::program_options::options_description telomereMutationsOptions("Telomere mutation Analysis Options:");
+        boost::program_options::options_description telomereMutationsOptions("Telomere mutation Analysis Options");
         iwgsAnalysisOptions.add_options()
                 ("telomere_mutations.target_file", boost::program_options::value<std::string>(&telomere_mutations.target_file), "Reference file.")
                 ("telomere_mutations.query_file", boost::program_options::value<std::string>(&telomere_mutations.query_file), "Input file.")

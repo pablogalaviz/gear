@@ -59,6 +59,7 @@ namespace cmri {
 
     struct mutations_t {
         std::string name;
+        std::string comment;
         int rs;
         int re;
         int qs;
@@ -69,6 +70,7 @@ namespace cmri {
         int blen;
         double score=0;
         std::string seq;
+        std::string qv;
         std::map<int, std::vector<sbs_t>> sbs;
         std::map<int, std::vector<indel_t>> indels;
 
@@ -83,6 +85,7 @@ namespace cmri {
         double mean_del_size=0;
         double mean_del_qv=0;
         int del_count=0;
+        int reverse;
 
         std::string cs_str;
 
@@ -99,6 +102,7 @@ namespace cmri {
             result << "\"mlen\":" << mlen << ",";
             result << "\"blen\":" << blen << ",";
             result << "\"score\":" << score << ",";
+            result << "\"reverse\":" << reverse << ",";
 
             /*
             for(auto &item : count){
@@ -121,7 +125,9 @@ namespace cmri {
             result << "\"indels\":" << ::cmri::serialize(indels) << ",";
 
             result << "\"seq\":\"" << seq << "\",";
+            result << "\"qv\":\"" << qv << "\",";
             result << "\"cs_str\":\"" << cs_str << "\",";
+            result << "\"comment\":\"" << comment << "\",";
             result << "\"name\":\"" << name << "\"";
             result << "}";
             return result.str();

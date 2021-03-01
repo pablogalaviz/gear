@@ -30,8 +30,8 @@ std::pair<std::string,std::string> cmri::filterWorker(const std::vector<std::pai
     std::stringstream result2;
 
     for(auto &item : sequences) {
-        if (iwgs.consecutive_count(item.first.name, item.first.seq, item.first.qual) > 5 ||
-            iwgs.consecutive_count(item.second.name, item.second.seq, item.second.qual) > 5) {
+        if (iwgs.consecutive_count(item.first.name, item.first.seq, item.first.qual)  ||
+            iwgs.consecutive_count(item.second.name, item.second.seq, item.second.qual) ) {
             result1 << "@" << item.first.name << " " << item.first.comment << std::endl;
             result1 << item.first.seq << std::endl;
             result1 << "+" << std::endl;
@@ -77,7 +77,7 @@ void cmri::mainIwgsAnalysis(const common_options_t &common_options,
             variants.push_back(item.second.get_value<std::string>());
         }
 
-        iwgsAnalysis iwgs("TTAGGG", variants, 5);
+        iwgsAnalysis iwgs("TTAGGG", variants, iwgs_options.count_filter_threshold);
 
         std::vector< std::pair<my_kseq_t,my_kseq_t> > sequences[common_options.threads];
 
@@ -138,7 +138,7 @@ void cmri::mainIwgsAnalysis(const common_options_t &common_options,
 
 }
 
-int cmri::iwgsAnalysis::consecutive_count(const std::string &name, const std::string &sequence, const std::string &quality){
+bool cmri::iwgsAnalysis::consecutive_count(const std::string &name, const std::string &sequence, const std::string &quality){
 
 
     int forward_consecutive=0;
@@ -198,7 +198,7 @@ int cmri::iwgsAnalysis::consecutive_count(const std::string &name, const std::st
     }
     */
 
-    return std::max(forward_consecutive,reverse_consecutive);
+    return std::max(forward_consecutive,reverse_consecutive) >= count_filter_threshold;
 
 }
 

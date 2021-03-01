@@ -95,6 +95,7 @@ cmri::mainTelomereMutations(common_options_t common_options, telomere_mutations_
                 int qs = r->qs;
                 int qe = r->qe;
                 std::string que;
+                std::string qv_str;
                 std::vector<int> qv;
                 if(r->rev){
                     qs = ks->seq.l - r->qe;
@@ -103,12 +104,14 @@ cmri::mainTelomereMutations(common_options_t common_options, telomere_mutations_
                         qv.push_back(static_cast<int>(ks->qual.s[i]) - 33);
                     }
                     que=reverse_complement(ks->seq.s);
+                    qv_str = reverse_string(ks->qual.s);
                 }
                 else{
                     for (int i = 0; i < ks->qual.l; i++) {
                         qv.push_back(static_cast<int>(ks->qual.s[i]) - 33);
                     }
                     que = ks->seq.s;
+                    qv_str = ks->qual.s;
                 }
                 int size;
                 for (auto &item : cm_tag) {
@@ -154,6 +157,7 @@ cmri::mainTelomereMutations(common_options_t common_options, telomere_mutations_
                 double score = ( static_cast<double>(r->blen+ r->mlen)/ks->seq.l + r->mapq/60.0)/3.0;
                 if(mut.score < score) {
                     mut.name = ks->name.s;
+                    mut.comment = ks->comment.s;
                     mut.rs = r->rs;
                     mut.re = r->re;
                     mut.qs = r->qs;
@@ -167,7 +171,9 @@ cmri::mainTelomereMutations(common_options_t common_options, telomere_mutations_
                     mut.score = score;
                     mut.variants = find_variants(que);
                     mut.seq = que;
+                    mut.qv = qv_str;
                     mut.cs_str = cs_str;
+                    mut.reverse = r->rev;
                 }
 
                 free(cs_str);

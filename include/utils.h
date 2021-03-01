@@ -31,6 +31,7 @@
 #include <boost/program_options/variables_map.hpp>
 #include <boost/iostreams/filter/gzip.hpp>
 #include <boost/iostreams/filtering_streambuf.hpp>
+#include <algorithm>
 #include <chrono>
 #include "logger.h"
 #include <map>
@@ -82,6 +83,10 @@ namespace cmri {
         return result;
     }
 
+    inline std::string reverse_string(std::string item){
+        std::reverse(item.begin(),item.end());
+        return item;
+    }
 
     inline format_t file_format(std::string name) {
 
