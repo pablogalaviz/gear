@@ -156,8 +156,8 @@ cmri::mainTelomereMutations(common_options_t common_options, telomere_mutations_
 
                 double score = ( static_cast<double>(r->blen+ r->mlen)/ks->seq.l + r->mapq/60.0)/3.0;
                 if(mut.score < score) {
-                    mut.name = ks->name.s;
-                    mut.comment = ks->comment.s;
+                    mut.name = ks->name.l>0?ks->name.s:"";
+                    mut.comment = ks->comment.l >0 ? ks->comment.s : "";
                     mut.rs = r->rs;
                     mut.re = r->re;
                     mut.qs = r->qs;
