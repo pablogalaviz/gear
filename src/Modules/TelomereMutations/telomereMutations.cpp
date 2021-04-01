@@ -86,7 +86,7 @@ cmri::mainTelomereMutations(common_options_t common_options, telomere_mutations_
                 LOGGER.debug << cs_str << std::endl;
 
 
-                auto cm_tag = parseTag(cs_str);
+                auto cm_tag = parseTag(cs_str,r->rev);
                 std::map<int, std::vector<sbs_t>> sbs;
                 std::map<int, std::vector<indel_t>> indels;
 
@@ -113,6 +113,8 @@ cmri::mainTelomereMutations(common_options_t common_options, telomere_mutations_
                     que = ks->seq.s;
                     qv_str = ks->qual.s;
                 }
+
+
                 int size;
                 for (auto &item : cm_tag) {
                     switch (item.first) {
@@ -130,7 +132,7 @@ cmri::mainTelomereMutations(common_options_t common_options, telomere_mutations_
                             std::string kind = item.first == '-' ? "del" : "ins";
                             LOGGER.debug << kind << " " << item.second << std::endl;
                             indel_t del = {kind, rs % 6, item.second, sum / size};
-                            indels[int(std::ceil(rs / 6))].push_back(del);
+                            indels[qs].push_back(del);
                             if (item.first == '-') {
                                 rs += size;
                             } else {
@@ -140,8 +142,13 @@ cmri::mainTelomereMutations(common_options_t common_options, telomere_mutations_
                             break;
                         case '*': {
                             LOGGER.debug << "SBS: " << item.second << " " << que[qs] << std::endl;
-                            sbs_t m = {rs % 6, que[qs], qv[qs]};
-                            sbs[int(std::ceil(rs / 6))].push_back(m);
+                            int is=std::max<int>(0,qs-2);
+                            int ie=std::min<int>(qv.size(),qs+3);
+                            double sum=0;
+                            int count=0;
+                            for (int i = is; i < ie; i++) { sum += qv[i];count++;}
+                            sbs_t m = {rs % 6, que[qs], qv[qs],sum/count};
+                            sbs[qs].push_back(m);
                             size = item.second.size() / 2;
                             rs += size;
                             qs += size;
@@ -156,12 +163,17 @@ cmri::mainTelomereMutations(common_options_t common_options, telomere_mutations_
 
                 double score = ( static_cast<double>(r->blen+ r->mlen)/ks->seq.l + r->mapq/60.0)/3.0;
                 if(mut.score < score) {
+
+                    auto rng = get_trimmed_range(qv,telomere_mutation_options.trimming_window_mean,telomere_mutation_options.trimming_threshold);
+
                     mut.name = ks->name.l>0?ks->name.s:"";
                     mut.comment = ks->comment.l >0 ? ks->comment.s : "";
                     mut.rs = r->rs;
                     mut.re = r->re;
-                    mut.qs = r->qs;
-                    mut.qe = r->qe;
+                    mut.qs = r->rev ? ks->seq.l - r->qe : r->qs;
+                    mut.qe = r->rev ? ks->seq.l - r->qs : r->qe;
+                    mut.ts = rng.first;
+                    mut.te = rng.second;
                     mut.seq_len = ks->seq.l;
                     mut.mapq = r->mapq;
                     mut.indels = indels;
@@ -172,6 +184,8 @@ cmri::mainTelomereMutations(common_options_t common_options, telomere_mutations_
                     mut.variants = find_variants(que);
                     mut.seq = que;
                     mut.qv = qv_str;
+                    mut.seq_trimmed=trimm_string(que,rng.first,rng.second,'N');
+                    mut.qv_trimmed=trimm_string(qv_str,rng.first,rng.second,'!');
                     mut.cs_str = cs_str;
                     mut.reverse = r->rev;
                 }
@@ -183,6 +197,7 @@ cmri::mainTelomereMutations(common_options_t common_options, telomere_mutations_
             if(mut.score > 0) {
                 mut.find_mutations();
                 mutations.push_back(mut);
+
             }
 
             free(reg);

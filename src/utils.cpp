@@ -32,24 +32,17 @@ void cmri::show_options(boost::program_options::variables_map vm){
         std::stringstream ss;
         ss << std::setw(30) << std::left << item.first << " : ";
         boost::any value = item.second.value();
-        if (is_type<std::string>(value))
-            ss << item.second.as<std::string>();
-        else
-        {
-            if (is_type<int>(value))
-                ss << item.second.as<int>();
-            else
-            {
-                if (is_type<unsigned int>(value))
-                    ss << item.second.as<unsigned int>();
-                else
-                {
-                    if (is_type<double>(value))
-                        ss << item.second.as<double>();
-                    else
-                    {
-                        if (is_type<bool>(value)){
-                            ss <<  (item.second.as<bool>()? "true":"false");
+        if (is_type<std::string>(value)) { ss << item.second.as<std::string>(); }
+        else {
+            if (is_type<int>(value)) { ss << item.second.as<int>(); }
+            else {
+                if (is_type<unsigned int>(value)) { ss << item.second.as<unsigned int>(); }
+                else {
+                    if (is_type<double>(value)) { ss << item.second.as<double>(); }
+                    else {
+                        if (is_type<bool>(value)) {ss << (item.second.as<bool>() ? "true" : "false");}
+                        else {
+                            if (is_type<size_t>(value)) {ss << item.second.as<size_t>();}
                         }
                     }
                 }
