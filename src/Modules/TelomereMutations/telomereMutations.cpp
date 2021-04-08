@@ -131,8 +131,12 @@ cmri::mainTelomereMutations(common_options_t common_options, telomere_mutations_
                             for (int i = qs; i < qs + size; i++) { sum += qv[i]; }
                             std::string kind = item.first == '-' ? "del" : "ins";
                             LOGGER.debug << kind << " " << item.second << std::endl;
-                            indel_t del = {kind, rs % 6, item.second, sum / size};
-                            indels[qs].push_back(del);
+                            indel_t indel;
+                            indel.kind = kind;
+                            indel.pos = rs%6;
+                            indel.seq = item.second;
+                            indel.mean_qv = sum/size;
+                            indels[qs].push_back(indel);
                             if (item.first == '-') {
                                 rs += size;
                             } else {
@@ -147,7 +151,11 @@ cmri::mainTelomereMutations(common_options_t common_options, telomere_mutations_
                             double sum=0;
                             int count=0;
                             for (int i = is; i < ie; i++) { sum += qv[i];count++;}
-                            sbs_t m = {rs % 6, que[qs], qv[qs],sum/count};
+                            sbs_t m;
+                            m.pos=rs % 6;
+                            m.value = que[qs];
+                            m.qv = qv[qs];
+                            m.mean_qv = sum/count;
                             sbs[qs].push_back(m);
                             size = item.second.size() / 2;
                             rs += size;
@@ -166,6 +174,15 @@ cmri::mainTelomereMutations(common_options_t common_options, telomere_mutations_
 
                     auto rng = get_trimmed_range(qv,telomere_mutation_options.trimming_window_mean,telomere_mutation_options.trimming_threshold);
 
+                    for (auto &item : sbs)
+                        for (auto &v : item.second) {
+                            if (item.first < rng.first || item.first > rng.second) { v.is_trimmed = true; }
+                        }
+                    for (auto &item : indels)
+                        for (auto &v : item.second) {
+                            if (item.first < rng.first || item.first > rng.second) { v.is_trimmed = true; }
+                        }
+
                     mut.name = ks->name.l>0?ks->name.s:"";
                     mut.comment = ks->comment.l >0 ? ks->comment.s : "";
                     mut.rs = r->rs;
@@ -181,7 +198,7 @@ cmri::mainTelomereMutations(common_options_t common_options, telomere_mutations_
                     mut.blen = r->blen;
                     mut.mlen = r->mlen;
                     mut.score = score;
-                    mut.variants = find_variants(que);
+                    mut.variants = find_variants(que.substr(mut.qs,mut.qe-mut.qs));
                     mut.seq = que;
                     mut.qv = qv_str;
                     mut.seq_trimmed=trimm_string(que,rng.first,rng.second,'N');

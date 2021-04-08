@@ -17,6 +17,7 @@ namespace cmri {
         char value;
         int qv;
         double mean_qv;
+        bool is_trimmed = false;
 
         std::string serialize() const {
             std::stringstream result;
@@ -24,6 +25,7 @@ namespace cmri {
             result << "\"pos\":" << pos << ",";
             result << "\"qv\":" << qv << ",";
             result << "\"mean_qv\":" << mean_qv << ",";
+            result << "\"is_trimmed\":" << is_trimmed << ",";
             result << "\"value\":\"" << value << "\"";
             result << "}";
             return result.str();
@@ -40,12 +42,14 @@ namespace cmri {
         int pos;
         std::string seq;
         double mean_qv;
+        bool is_trimmed = false;
 
         std::string serialize() const {
             std::stringstream result;
             result << "{";
             result << "\"pos\":" << pos << ",";
             result << "\"mean_qv\":" << mean_qv << ",";
+            result << "\"is_trimmed\":" << is_trimmed << ",";
             result << "\"seq\":\"" << seq << "\",";
             result << "\"kind\":\"" << kind << "\"";
             result << "}";
@@ -73,6 +77,7 @@ namespace cmri {
         int mapq;
         int mlen;
         int blen;
+        int tlen;
         double score = 0;
         std::string seq;
         std::string qv;
@@ -110,6 +115,7 @@ namespace cmri {
             result << "\"mapq\":" << mapq << ",";
             result << "\"mlen\":" << mlen << ",";
             result << "\"blen\":" << blen << ",";
+            result << "\"tlen\":" << tlen << ",";
             result << "\"score\":" << score << ",";
             result << "\"reverse\":" << reverse << ",";
 
@@ -223,7 +229,7 @@ namespace cmri {
 
         while (std::regex_search(sequence, match, basic_regex)) {
             // suffix to find the rest of the string.
-            std::string prefix = match.prefix().str();
+            std::string prefix = match.str();
             if (!prefix.empty()) {
                 if (result.find(prefix) == result.end()) {
                     result[prefix] = 1;
