@@ -1,11 +1,3 @@
-
-#include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/json_parser.hpp>
-#include <faidx.h>
-#include <bedWriter.h>
-#include "genomeAnalysis.h"
-#include "telomereRegion.h"
-
 //
 // Author(s) Pablo Galaviz (2020)
 // e-mail  <pgalaviz@cmri.org.au>
@@ -29,6 +21,12 @@
 //  along with GEAR.  If not, see <http://www.gnu.org/licenses/>.
 //
 
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/json_parser.hpp>
+#include <faidx.h>
+#include <bedWriter.h>
+#include "genomeAnalysis.h"
+#include "telomereRegion.h"
 #include <math.h>
 
 void cmri::mainGenomeAnalysis(const common_options_t &common_options,

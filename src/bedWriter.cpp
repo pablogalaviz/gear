@@ -4,6 +4,10 @@
 
 #include "bedWriter.h"
 
+/**
+ *
+ * @param file_name
+ */
 cmri::bedWriter::bedWriter(std::string file_name) {
 
     file.open(file_name);
@@ -25,6 +29,20 @@ cmri::bedWriter::~bedWriter() {
     file.close();
 }
 
+/**
+ *
+ * @param chromosome
+ * @param start
+ * @param end
+ * @param name
+ * @param score
+ * @param strand
+ * @param thickStart
+ * @param thickEnd
+ * @param r
+ * @param g
+ * @param b
+ */
 void cmri::bedWriter::append(std::string chromosome, int start, int end, std::string name, int score, bool strand, int thickStart,
                              int thickEnd, int r, int g,int b) {
 
