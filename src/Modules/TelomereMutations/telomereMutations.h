@@ -81,6 +81,7 @@ namespace cmri {
         double score = 0;
         std::string seq;
         std::string qv;
+        //@TODO: remove trimming stuff
         std::string seq_trimmed;
         std::string qv_trimmed;
         std::map<int, std::vector<sbs_t>> sbs;
@@ -109,8 +110,8 @@ namespace cmri {
             result << "\"re\":" << re << ",";
             result << "\"qs\":" << qs << ",";
             result << "\"qe\":" << qe << ",";
-            result << "\"ts\":" << ts << ",";
-            result << "\"te\":" << te << ",";
+            //result << "\"ts\":" << ts << ",";
+            //result << "\"te\":" << te << ",";
             result << "\"seq_len\":" << seq_len << ",";
             result << "\"mapq\":" << mapq << ",";
             result << "\"mlen\":" << mlen << ",";
@@ -140,9 +141,9 @@ namespace cmri {
             result << "\"indels\":" << ::cmri::serialize(indels) << ",";
 
             result << "\"seq\":\"" << seq << "\",";
-            result << "\"qv\":\"" << qv << "\",";
-            result << "\"seq_trimmed\":\"" << seq_trimmed << "\",";
-            result << "\"qv_trimmed\":\"" << qv_trimmed << "\",";
+            result << "\"qv\":\"" << escape_json(qv) << "\",";
+            //result << "\"seq_trimmed\":\"" << seq_trimmed << "\",";
+            //result << "\"qv_trimmed\":\"" << escape_json(qv_trimmed) << "\",";
             result << "\"cs_str\":\"" << cs_str << "\",";
             result << "\"comment\":\"" << comment << "\",";
             result << "\"name\":\"" << name << "\"";
