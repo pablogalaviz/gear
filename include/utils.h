@@ -31,6 +31,7 @@
 #include <boost/program_options/variables_map.hpp>
 #include <boost/iostreams/filter/gzip.hpp>
 #include <boost/iostreams/filtering_streambuf.hpp>
+#include <algorithm>
 #include <chrono>
 #include "logger.h"
 #include <map>
@@ -82,6 +83,10 @@ namespace cmri {
         return result;
     }
 
+    inline std::string reverse_string(std::string item){
+        std::reverse(item.begin(),item.end());
+        return item;
+    }
 
     inline format_t file_format(std::string name) {
 
@@ -256,6 +261,72 @@ namespace cmri {
                    factor;
         }
         return result;
+    }
+
+    template<class T>
+    inline std::string serialize(const T &item) {
+        std::stringstream sample_data;
+        sample_data << item;
+        return sample_data.str();
+    };
+
+
+    template<class T>
+    std::string serialize(const std::vector<T> &vector_data) {
+        std::stringstream result;
+        result << "[";
+        int list_size= vector_data.size();
+        for(int i=0; i < list_size; i++){
+            result << serialize(vector_data[i]) << (i<list_size-1 ? "," :"");
+        }
+        result << "]";
+        return result.str();
+    };
+
+    template<class S, class T>
+    std::string serialize(const std::map<S,T> &map_data) {
+        std::stringstream result;
+        result << "{";
+        for(auto iter_data = map_data.begin(); iter_data != map_data.end(); ++iter_data){
+            result << "\"" << iter_data->first << "\":";
+            result << serialize(iter_data->second);
+            result << (std::next(iter_data) != map_data.end() ? "," : "");
+        }
+        result << "}";
+
+        return result.str();
+    };
+
+
+    inline std::vector<std::pair<char, std::string>> parseTag(std::string tag, bool reverse) {
+        std::vector<std::pair<char, std::string>> result;
+
+        std::string value;
+        char state = ' ';
+
+        for (auto &t : tag) {
+            if (t == ':' || t == '+' || t == '-' || t == '*') {
+                if (state != ' ') {
+                    result.push_back(std::make_pair(state, value));
+                    value = "";
+                }
+                state = t;
+            } else {
+                value += t;
+            }
+        }
+
+        if (state != ' ') {
+            result.push_back(std::make_pair(state, value));
+        }
+
+        /*
+        if (reverse){
+            std::reverse(result.begin(),result.end());
+        }
+*/
+        return result;
+
     }
 
 

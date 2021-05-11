@@ -66,6 +66,25 @@ namespace cmri
                     {log_t::WARNING, "\033[1;33m"},
                     {log_t::ERROR  , "\033[1;31m"}};
 
+            template<class T>
+            std::stringstream get_formatted_stream(const T out, bool console){
+
+                std::stringstream ss;
+                if(m_new_line)
+                {
+                    std::time_t t = std::time(nullptr);
+                    std::tm tm = *std::localtime(&t);
+                    ss << (console ? color_map[m_current] : "")
+                       << m_label
+                       << std::put_time(&tm, "[%F %T] | ")
+                       << (console ? "\033[0m" : "");
+                }
+                ss << out;
+
+                return ss;
+            }
+
+
         public:
 
             std::ofstream file;
@@ -91,27 +110,15 @@ namespace cmri
             {
                 if(m_level <= m_current)
                 {
-                    std::stringstream ss;
-                    if(m_new_line)
-                    {
-                        std::time_t t = std::time(nullptr);
-                        std::tm tm = *std::localtime(&t);
-                        ss << color_map[m_current]
-                           << m_label
-                           << std::put_time(&tm, "[%F %T] | ")
-                           << "\033[0m";
-                        m_new_line = false;
-                    }
-                    ss << out;
-                    file << ss.str();
+                    file << get_formatted_stream(out,false).str();
                     file.flush();
                     {
                         if(m_current == log_t::ERROR)
-                            std::cerr << ss.str();
+                            std::cerr << get_formatted_stream(out,true).str();
                         else
-                            std::cout << ss.str();
+                            std::cout << get_formatted_stream(out,true).str();
                     }
-
+                    if(m_new_line){ m_new_line = false;}
                 }
                 return *this;
             }

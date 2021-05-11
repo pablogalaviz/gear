@@ -32,7 +32,10 @@
 #include <string>
 #include <zlib.h>
 
+#ifndef KSEQ_DEF
+#define KSEQ_DEF
 KSEQ_INIT(gzFile, gzread)
+#endif //KSEQ_DEF
 
 namespace cmri {
 

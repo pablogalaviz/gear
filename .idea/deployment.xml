@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="PublishConfigData" remoteFilesAllowedToDisappearOnAutoupload="false">
+    <serverData>
+      <paths name="BioInfo (607847fd-58bc-4989-ac61-7bd9eb97c001)">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/home/pgalaviz/Development" local="$PROJECT_DIR$" web="/" />
+          </mappings>
+          <excludedPaths>
+            <excludedPath local="true" path="$PROJECT_DIR$/cmake-build-release" />
+            <excludedPath local="true" path="$PROJECT_DIR$/cmake-build-release-bioinfo" />
+            <excludedPath local="true" path="$PROJECT_DIR$/cmake-build-debug-bioinfo" />
+            <excludedPath local="true" path="$PROJECT_DIR$/cmake-build-debug" />
+          </excludedPaths>
+        </serverdata>
+      </paths>
+      <paths name="Titan (2e8f1495-5090-462e-b511-d37f6bca1467)">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/home/pablo/Development/gear" local="$PROJECT_DIR$" web="/" />
+          </mappings>
+          <excludedPaths>
+            <excludedPath local="true" path="$PROJECT_DIR$/cmake-build-debug-titan" />
+            <excludedPath local="true" path="$PROJECT_DIR$/cmake-build-release" />
+            <excludedPath local="true" path="$PROJECT_DIR$/cmake-build-debug-remote" />
+            <excludedPath local="true" path="$PROJECT_DIR$/cmake-build-debug" />
+          </excludedPaths>
+        </serverdata>
+      </paths>
+    </serverData>
+  </component>
+</project>
