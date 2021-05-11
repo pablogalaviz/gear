@@ -105,6 +105,8 @@ int main(const int ac, char *av[]) {
                 ("telomere_mutations.target_file", boost::program_options::value<std::string>(&telomere_mutations.target_file), "Reference file.")
                 ("telomere_mutations.wt_motif", boost::program_options::value<std::string>(&telomere_mutations.wt_motif)->default_value("TTAGGG"), "Wild type motif. (TTAGGG)")
                 ("telomere_mutations.query_file", boost::program_options::value<std::string>(&telomere_mutations.query_file), "Input file.")
+                ("telomere_mutations.trimming_window_mean", boost::program_options::value<size_t>(&telomere_mutations.trimming_window_mean)->default_value(6), "Size of the mean sliding window.")
+                ("telomere_mutations.trimming_threshold", boost::program_options::value<int>(&telomere_mutations.trimming_threshold)->default_value(20), "Trimming threshold, sliding window mean < threshold.")
                 ;
 
 
@@ -169,38 +171,47 @@ int main(const int ac, char *av[]) {
 
         cmri::show_options(vm);
 
-        if(task == "MotifCount") {
-            motif_count.validate();
-            common.validate();
-            cmri::mainMotifCount(common,motif_count);
-        }
-        else {
-            if (task == "VariantCallAnalysis") {
+        switch (cmri::str2task[task]) {
+
+            case cmri::task_t::GenomeAnalysis :
+                genome_analysis.validate();
+                common.validate();
+                cmri::mainGenomeAnalysis(common, genome_analysis);
+                break;
+            case cmri::task_t::IwgsAnalysis :
+                iwgs_analysis.validate();
+                common.validate();
+                cmri::mainIwgsAnalysis(common, iwgs_analysis);
+                break;
+            case cmri::task_t::MotifCount :
+                motif_count.validate();
+                common.validate();
+                cmri::mainMotifCount(common,motif_count);
+                break;
+            case cmri::task_t::QVSelector :
+                iwgs_analysis.validate();
+                common.validate();
+                cmri::mainQVSelector(common, iwgs_analysis);
+                break;
+            case cmri::task_t::RandomSelector :
+                common.validate();
+                cmri::mainRandomSelector(common);
+                break;
+            case cmri::task_t::TelomereMutations :
+                telomere_mutations.validate();
+                cmri::mainTelomereMutations(common, telomere_mutations);
+                break;
+            case cmri::task_t::VariantCallAnalysis :
                 variant_call_analysis.validate();
                 common.validate();
                 cmri::mainVariantCallAnalysis(common, variant_call_analysis);
-            }else{
-                if (task == "GenomeAnalysis") {
-                    genome_analysis.validate();
-                    common.validate();
-                    cmri::mainGenomeAnalysis(common, genome_analysis);
-                }else{
-                    if (task == "IwgsAnalysis") {
-                        iwgs_analysis.validate();
-                        common.validate();
-                        cmri::mainIwgsAnalysis(common, iwgs_analysis);
-                    }else{
-                        if (task == "TelomereMutations") {
-                            telomere_mutations.validate();
-                            cmri::mainTelomereMutations(common, telomere_mutations);
-                        }else{
-                            cmri::LOGGER.error << "Unknown task: " << task;
-                            std::cerr << cmdlineOptions << std::endl;
-                        }
-                    }
-                }
-            }
+                break;
+            default:
+                cmri::LOGGER.error << "Unknown task: " << task;
+                std::cerr << cmdlineOptions << std::endl;
+
         }
+
 
         cmri::goodbye(start_time);
 

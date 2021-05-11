@@ -298,7 +298,7 @@ namespace cmri {
     };
 
 
-    inline std::vector<std::pair<char, std::string>> parseTag(std::string tag) {
+    inline std::vector<std::pair<char, std::string>> parseTag(std::string tag, bool reverse) {
         std::vector<std::pair<char, std::string>> result;
 
         std::string value;
@@ -316,6 +316,15 @@ namespace cmri {
             }
         }
 
+        if (state != ' ') {
+            result.push_back(std::make_pair(state, value));
+        }
+
+        /*
+        if (reverse){
+            std::reverse(result.begin(),result.end());
+        }
+*/
         return result;
 
     }
