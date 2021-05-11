@@ -24,6 +24,10 @@
 
 #include "../include/utils.h"
 
+/**
+ * Shows the current arguments and their corresponding values.
+ * @param vm is a boost variable_map object.
+ */
 void cmri::show_options(boost::program_options::variables_map vm){
     LOGGER.info << "Parameters :" << std::endl;
     LOGGER.info << "..............................................................." << std::endl;
@@ -53,6 +57,10 @@ void cmri::show_options(boost::program_options::variables_map vm){
     LOGGER.info << "..............................................................." << std::endl;
 }
 
+/**
+ * Show and welcome message
+ * @param code_name in this case GEAR
+ */
 void cmri::welcome(const std::string &code_name)
 {
 
@@ -76,7 +84,12 @@ void cmri::welcome(const std::string &code_name)
     LOGGER.info << "" << std::endl;
 }
 
-
+/**
+ * Returns a string in time format
+ * @param value time in specified units
+ * @param unit the unit of the time
+ * @return
+ */
 std::string cmri::get_time_str(long value, const std::string& unit)
 {
 
@@ -93,6 +106,10 @@ std::string cmri::get_time_str(long value, const std::string& unit)
     return result.str();
 }
 
+/**
+ * Shows a good bye message and performance metrics
+ * @param start
+ */
 void cmri::goodbye( std::chrono::system_clock::time_point start){
     auto stop = std::chrono::system_clock::now();
 

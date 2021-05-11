@@ -3,8 +3,6 @@
 // e-mail  <pgalaviz@cmri.org.au>
 //
 
-
-
 //  This file is part of GEAR
 //
 //  GEAR is free software: you can redistribute it and/or modify
@@ -37,7 +35,11 @@
 
 
 int main(const int ac, char *av[]) {
-
+    /**
+     * Main function. Setup logger, parse arguments and parameter file.
+     * Call the task function.
+     * Report performance metrics.
+     */
 
     try {
 
@@ -101,7 +103,7 @@ int main(const int ac, char *av[]) {
 
         cmri::telomere_mutations_options_t telomere_mutations;
         boost::program_options::options_description telomereMutationsOptions("Telomere mutation Analysis Options");
-        iwgsAnalysisOptions.add_options()
+        telomereMutationsOptions.add_options()
                 ("telomere_mutations.target_file", boost::program_options::value<std::string>(&telomere_mutations.target_file), "Reference file.")
                 ("telomere_mutations.wt_motif", boost::program_options::value<std::string>(&telomere_mutations.wt_motif)->default_value("TTAGGG"), "Wild type motif. (TTAGGG)")
                 ("telomere_mutations.query_file", boost::program_options::value<std::string>(&telomere_mutations.query_file), "Input file.")
@@ -171,7 +173,7 @@ int main(const int ac, char *av[]) {
 
         cmri::show_options(vm);
 
-        switch (cmri::str2task[task]) {
+        switch (cmri::str2task.at(task)) {
 
             case cmri::task_t::GenomeAnalysis :
                 genome_analysis.validate();
@@ -207,14 +209,20 @@ int main(const int ac, char *av[]) {
                 cmri::mainVariantCallAnalysis(common, variant_call_analysis);
                 break;
             default:
-                cmri::LOGGER.error << "Unknown task: " << task;
-                std::cerr << cmdlineOptions << std::endl;
+                cmri::LOGGER.error << "Unknown task: " << task << std::endl;
+                cmri::LOGGER.error << "Valid options are: " << std::endl;
+                for(auto &item : cmri::str2task ){cmri::LOGGER.error << item.first<< std::endl;}
 
         }
 
 
         cmri::goodbye(start_time);
 
+    }
+    catch (const std::out_of_range& oor) {
+        cmri::LOGGER.error << "Unknown task, valid options are: " << std::endl;
+        for(auto &item : cmri::str2task ){cmri::LOGGER.error << item.first<< std::endl;}
+        return -1;
     }
     catch (std::exception &e) {
         std::cerr << "Exception: " << e.what() << std::endl;
