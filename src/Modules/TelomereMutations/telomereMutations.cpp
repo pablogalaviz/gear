@@ -35,6 +35,11 @@ cmri::mainTelomereMutations(common_options_t common_options, telomere_mutations_
     kseq_t *ks = kseq_init(f);
 
     std::vector<mutations_t> mutations;
+    std::vector<char> wt_motif;
+    for(auto c : telomere_mutation_options.wt_motif){
+        wt_motif.push_back(c);
+    }
+    int wt_size = wt_motif.size();
 
     // open index reader
     mm_idx_reader_t *index_reader = mm_idx_reader_open(telomere_mutation_options.target_file.c_str(), &iopt, 0);
@@ -129,8 +134,8 @@ cmri::mainTelomereMutations(common_options_t common_options, telomere_mutations_
                             for (int i = qs; i < qs + size; i++) { sum += qv[i]; }
                             std::string kind = item.first == '-' ? "del" : "ins";
                             LOGGER.debug << kind << " " << item.second << std::endl;
-                            indel_t del = {kind, rs % 6, item.second, sum / size};
-                            indels[int(std::ceil(rs / 6))].push_back(del);
+                            indel_t del = {kind, rs % wt_size, item.second, sum / size};
+                            indels[int(std::ceil(rs / wt_size))].push_back(del);
                             if (item.first == '-') {
                                 rs += size;
                             } else {
@@ -140,8 +145,8 @@ cmri::mainTelomereMutations(common_options_t common_options, telomere_mutations_
                             break;
                         case '*': {
                             LOGGER.debug << "SBS: " << item.second << " " << que[qs] << std::endl;
-                            sbs_t m = {rs % 6, que[qs], qv[qs]};
-                            sbs[int(std::ceil(rs / 6))].push_back(m);
+                            sbs_t m = {rs % wt_size, que[qs], qv[qs]};
+                            sbs[int(std::ceil(rs / wt_size))].push_back(m);
                             size = item.second.size() / 2;
                             rs += size;
                             qs += size;
@@ -181,7 +186,7 @@ cmri::mainTelomereMutations(common_options_t common_options, telomere_mutations_
             }
 
             if(mut.score > 0) {
-                mut.find_mutations();
+                mut.find_mutations(wt_motif);
                 mutations.push_back(mut);
             }
 

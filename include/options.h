@@ -89,11 +89,24 @@ namespace cmri {
 
         std::string target_file;
         std::string query_file;
+        std::string wt_motif;
 
         void validate() {
             //test if files exists.
             cmri::open_file(target_file, "expecting target file").close();
             cmri::open_file(query_file, "expecting query file").close();
+            if(wt_motif.size() ==0){
+                LOGGER.error << "Expecting wild type motif " << std::endl;
+                exit(ENOENT);
+            }
+            for(auto c : wt_motif){
+                if(c != 'A' && c != 'T' &&c != 'G' &&c != 'C'){
+                    LOGGER.error << "Expecting wild type nucleotide motif, got:" << wt_motif << std::endl;
+                    exit(ENOENT);
+                }
+            }
+
+
         }
 
 

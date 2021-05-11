@@ -103,6 +103,7 @@ int main(const int ac, char *av[]) {
         boost::program_options::options_description telomereMutationsOptions("Telomere mutation Analysis Options");
         iwgsAnalysisOptions.add_options()
                 ("telomere_mutations.target_file", boost::program_options::value<std::string>(&telomere_mutations.target_file), "Reference file.")
+                ("telomere_mutations.wt_motif", boost::program_options::value<std::string>(&telomere_mutations.wt_motif)->default_value("TTAGGG"), "Wild type motif. (TTAGGG)")
                 ("telomere_mutations.query_file", boost::program_options::value<std::string>(&telomere_mutations.query_file), "Input file.")
                 ;
 
