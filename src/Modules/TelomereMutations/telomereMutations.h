@@ -120,14 +120,8 @@ namespace cmri {
             result << "\"score\":" << score << ",";
             result << "\"reverse\":" << reverse << ",";
 
-            /*
-            for(auto &item : count){
-                result << "\"" <<item.first <<"\":" << item.second << ",";
-            }
-            */
-            for (auto &item : variants) {
-                result << "\"" << item.first << "\":" << item.second << ",";
-            }
+            result << "\"mutations\":" << ::cmri::serialize(count) << ",";
+            result << "\"variants\":" << ::cmri::serialize(variants) << ",";
 
             result << "\"mean_ins_size\":" << mean_ins_size << ",";
             result << "\"mean_ins_qv\":" << mean_ins_qv << ",";
@@ -151,8 +145,7 @@ namespace cmri {
             return result.str();
         };
 
-
-        void find_mutations() {
+        void find_mutations(std::vector<char> motif){
 
 
             for (auto &item : sbs) {
@@ -161,9 +154,13 @@ namespace cmri {
                     continue;
                 }
 
-                char motif[] = {'T', 'T', 'A', 'G', 'G', 'G'};
-                for (auto &s : item.second) {
-                    motif[s.pos] = s.value;
+                for(auto &s : item.second){
+                    if(s.pos < motif.size()) {
+                        motif[s.pos] = s.value;
+                    }
+                else{
+                    LOGGER.warning << "Wild type motif out of rage" << std::endl;
+                }
                 }
 
                 std::string mutation = "";

@@ -105,6 +105,7 @@ int main(const int ac, char *av[]) {
         boost::program_options::options_description telomereMutationsOptions("Telomere mutation Analysis Options");
         telomereMutationsOptions.add_options()
                 ("telomere_mutations.target_file", boost::program_options::value<std::string>(&telomere_mutations.target_file), "Reference file.")
+                ("telomere_mutations.wt_motif", boost::program_options::value<std::string>(&telomere_mutations.wt_motif)->default_value("TTAGGG"), "Wild type motif. (TTAGGG)")
                 ("telomere_mutations.query_file", boost::program_options::value<std::string>(&telomere_mutations.query_file), "Input file.")
                 ("telomere_mutations.trimming_window_mean", boost::program_options::value<size_t>(&telomere_mutations.trimming_window_mean)->default_value(6), "Size of the mean sliding window.")
                 ("telomere_mutations.trimming_threshold", boost::program_options::value<int>(&telomere_mutations.trimming_threshold)->default_value(20), "Trimming threshold, sliding window mean < threshold.")

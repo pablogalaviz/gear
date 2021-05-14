@@ -35,6 +35,11 @@ cmri::mainTelomereMutations(common_options_t common_options, telomere_mutations_
     kseq_t *ks = kseq_init(f);
 
     std::vector<mutations_t> mutations;
+    std::vector<char> wt_motif;
+    for(auto c : telomere_mutation_options.wt_motif){
+        wt_motif.push_back(c);
+    }
+    int wt_size = wt_motif.size();
 
     // open index reader
     mm_idx_reader_t *index_reader = mm_idx_reader_open(telomere_mutation_options.target_file.c_str(), &iopt, 0);
@@ -45,7 +50,9 @@ cmri::mainTelomereMutations(common_options_t common_options, telomere_mutations_
         mm_tbuf_t *tbuf = mm_tbuf_init(); // thread buffer; for multi-threading, allocate one tbuf for each thread
         gzrewind(f);
         kseq_rewind(ks);
+        int count=0;
         while (kseq_read(ks) >= 0) { // each kseq_read() call reads one query sequence
+            count++;
             mm_reg1_t *reg;
             int j, i, n_reg;
             reg = mm_map(mi, ks->seq.l, ks->seq.s, &n_reg, tbuf, &mopt, 0); // get all hits for the query
@@ -133,7 +140,7 @@ cmri::mainTelomereMutations(common_options_t common_options, telomere_mutations_
                             LOGGER.debug << kind << " " << item.second << std::endl;
                             indel_t indel;
                             indel.kind = kind;
-                            indel.pos = rs%6;
+                            indel.pos = rs%wt_size;
                             indel.seq = item.second;
                             indel.mean_qv = sum/size;
                             indels[qs].push_back(indel);
@@ -149,13 +156,13 @@ cmri::mainTelomereMutations(common_options_t common_options, telomere_mutations_
                             int is=std::max<int>(0,qs-2);
                             int ie=std::min<int>(qv.size(),qs+3);
                             double sum=0;
-                            int count=0;
-                            for (int i = is; i < ie; i++) { sum += qv[i];count++;}
+                            int total=0;
+                            for (int i = is; i < ie; i++) { sum += qv[i];total++;}
                             sbs_t m;
-                            m.pos=rs % 6;
+                            m.pos=rs % wt_size;
                             m.value = que[qs];
                             m.qv = qv[qs];
-                            m.mean_qv = sum/count;
+                            m.mean_qv = sum / total;
                             sbs[qs].push_back(m);
                             size = item.second.size() / 2;
                             rs += size;
@@ -212,7 +219,7 @@ cmri::mainTelomereMutations(common_options_t common_options, telomere_mutations_
             }
 
             if(mut.score > 0) {
-                mut.find_mutations();
+                mut.find_mutations(wt_motif);
                 mutations.push_back(mut);
 
             }
@@ -220,6 +227,7 @@ cmri::mainTelomereMutations(common_options_t common_options, telomere_mutations_
             free(reg);
         }
 
+        LOGGER.info << "Total number of sequences: " << count << std::endl;
 
         mm_tbuf_destroy(tbuf);
         mm_idx_destroy(mi);

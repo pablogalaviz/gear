@@ -133,6 +133,7 @@ namespace cmri {
         size_t trimming_window_mean;
         int trimming_threshold;
 
+        std::string wt_motif;
 
         void validate() {
             //test if files exists.
@@ -140,6 +141,18 @@ namespace cmri {
             cmri::open_file(query_file, "expecting query file").close();
             trimming_window_mean=clip(trimming_window_mean,2ul,100ul);
             trimming_threshold=clip(trimming_threshold,0,100);
+            if(wt_motif.size() ==0){
+                LOGGER.error << "Expecting wild type motif " << std::endl;
+                exit(ENOENT);
+            }
+            for(auto c : wt_motif){
+                if(c != 'A' && c != 'T' &&c != 'G' &&c != 'C'){
+                    LOGGER.error << "Expecting wild type nucleotide motif, got:" << wt_motif << std::endl;
+                    exit(ENOENT);
+                }
+            }
+
+
         }
 
 
