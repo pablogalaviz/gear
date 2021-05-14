@@ -116,7 +116,7 @@ namespace cmri {
             result << "\"mapq\":" << mapq << ",";
             result << "\"mlen\":" << mlen << ",";
             result << "\"blen\":" << blen << ",";
-            result << "\"tlen\":" << tlen << ",";
+            //result << "\"tlen\":" << tlen << ",";
             result << "\"score\":" << score << ",";
             result << "\"reverse\":" << reverse << ",";
 
